@@ -53,6 +53,7 @@ export default function Home() {
       window.URL.revokeObjectURL(url)
 
       toast.success('ダウンロードが完了しました！', { id: loadingToastId })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message, { id: loadingToastId })
     } finally {
@@ -85,7 +86,7 @@ export default function Home() {
           gap: '20px',
         }}
       >
-        <h1>microCMS コンテンツCSVダウンローダー</h1>
+        <h1>microCMS CSV Exporter</h1>
 
         <p>
           サービスID、APIエンドポイント、APIキーを入力して、コンテンツをCSV形式でダウンロードします。
