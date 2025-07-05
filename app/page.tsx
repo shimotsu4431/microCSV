@@ -3,7 +3,12 @@
 import { useState } from 'react'
 import Head from 'next/head'
 import { Toaster, toast } from 'react-hot-toast'
-import styles from './Home.module.css' // CSSモジュールをインポート
+import styles from './Home.module.css'
+
+// 必要なライブラリを直接インポート
+import { createClient, MicroCMSContentId, MicroCMSDate } from 'microcms-js-sdk'
+import JSZip from 'jszip'
+import Papa from 'papaparse'
 
 // 型定義
 type KeyMapping = {
@@ -11,9 +16,11 @@ type KeyMapping = {
   endpoint: string
   key: string
 }
+type Content = { id: string } & MicroCMSContentId &
+  MicroCMSDate & { [key: string]: any }
 
 export default function Home() {
-  // State管理とハンドラ関数は変更なし
+  // --- State管理 ---
   const [serviceId, setServiceId] = useState('')
   const [endpoints, setEndpoints] = useState<string[]>([])
   const [currentEndpoint, setCurrentEndpoint] = useState('')
@@ -22,6 +29,7 @@ export default function Home() {
   const [keyMappings, setKeyMappings] = useState<KeyMapping[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
+  // --- UI操作ハンドラ ---
   const handleAddEndpoint = () => {
     if (currentEndpoint && !endpoints.includes(currentEndpoint)) {
       setEndpoints([...endpoints, currentEndpoint])
@@ -53,49 +61,102 @@ export default function Home() {
     )
   }
 
+  // --- メインのダウンロード処理 ---
   const handleDownload = async () => {
     if (!serviceId || endpoints.length === 0 || !defaultApiKey) {
       toast.error('サービスID、エンドポイント、デフォルトAPIキーは必須です。')
       return
     }
+
     setIsLoading(true)
     const loadingToastId = toast.loading('コンテンツを取得・圧縮中です...')
+
     try {
-      const res = await fetch('/api/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          serviceId,
-          endpoints,
-          defaultApiKey,
-          keyMappings: keyMappings.map(({ id, ...rest }) => rest),
-        }),
-      })
-      if (!res.ok) {
-        const errorData = await res.json()
-        throw new Error(errorData.message || 'ダウンロードに失敗しました。')
+      const zip = new JSZip()
+
+      // エンドポイントごとにループ処理
+      for (const endpoint of endpoints) {
+        // 1. 使用するAPIキーを決定
+        const apiKey =
+          keyMappings.find((m) => m.endpoint === endpoint)?.key || defaultApiKey
+        if (!apiKey) {
+          toast.error(`${endpoint}用のAPIキーがありません。`, {
+            id: loadingToastId,
+          })
+          continue
+        }
+
+        // 2. microCMSクライアントをブラウザで直接作成
+        const client = createClient({
+          serviceDomain: serviceId,
+          apiKey: apiKey,
+        })
+
+        // 3. 全コンテンツを取得
+        const allContents = await client.getAllContents<Content>({ endpoint })
+        if (allContents.length === 0) continue
+
+        // 4. ネストされたオブジェクト等をJSON文字列に変換
+        const contentsForCsv = allContents.map((content) => {
+          const newContent = { ...content }
+          for (const key in newContent) {
+            if (
+              typeof newContent[key] === 'object' &&
+              newContent[key] !== null
+            ) {
+              newContent[key] = JSON.stringify(newContent[key])
+            }
+          }
+          return newContent
+        })
+
+        // 5. CSVヘッダーを動的に作成
+        const allKeys = new Set<string>()
+        contentsForCsv.forEach((item) => {
+          Object.keys(item).forEach((key) => allKeys.add(key))
+        })
+        const header = Array.from(allKeys)
+
+        // 6. JSONをCSVに変換
+        const csv = Papa.unparse(contentsForCsv, { columns: header })
+
+        // 7. CSVをZIPファイルに追加
+        zip.file(`${endpoint}.csv`, csv)
       }
-      const blob = await res.blob()
-      const url = window.URL.createObjectURL(blob)
+
+      // 8. ZIPファイルを生成
+      const zipContent = await zip.generateAsync({ type: 'blob' })
+      if (zipContent.size === 0) {
+        toast.error('ダウンロード対象のコンテンツがありませんでした。', {
+          id: loadingToastId,
+        })
+        setIsLoading(false)
+        return
+      }
+
+      // 9. ダウンロードリンクを生成してクリック
+      const url = window.URL.createObjectURL(zipContent)
       const a = document.createElement('a')
       a.href = url
-      a.download =
-        res.headers
-          .get('Content-Disposition')
-          ?.split('filename=')[1]
-          .replace(/"/g, '') || 'export.zip'
+      a.download = `microcms-export_${
+        new Date().toISOString().split('T')[0]
+      }.zip`
       document.body.appendChild(a)
       a.click()
       a.remove()
       window.URL.revokeObjectURL(url)
+
       toast.success('ダウンロードが完了しました！', { id: loadingToastId })
     } catch (error: any) {
-      toast.error(error.message, { id: loadingToastId })
+      console.error(error)
+      const errorMessage = error.message || 'エラーが発生しました。'
+      toast.error(errorMessage, { id: loadingToastId })
     } finally {
       setIsLoading(false)
     }
   }
 
+  // --- JSX (UI部分) ---
   return (
     <>
       <Head>
@@ -104,12 +165,11 @@ export default function Home() {
       <Toaster position="top-right" />
 
       <main className={styles.main}>
-        <h1>microCSV</h1>
+        <h1>microCMS Exporter</h1>
         <p>
-          microCMSから、複数のエンドポイントを対象にコンテンツを一括で取得し（CSV）、ZIP形式でダウンロードするツールです。
+          複数のエンドポイントからコンテンツを一括で取得し、ZIP形式でダウンロードします。
         </p>
 
-        {/* --- 入力フォーム --- */}
         <div className={styles.formSection}>
           <label htmlFor="serviceId">サービスID:</label>
           <input
@@ -173,15 +233,21 @@ export default function Home() {
           </p>
         </div>
 
-        {/* --- 個別キー設定 --- */}
         <div className={styles.formSection}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+            }}
+          >
             <input
               type="checkbox"
               checked={showKeyOverrides}
               onChange={(e) => setShowKeyOverrides(e.target.checked)}
             />
-            特定のエンドポイントに別のAPIキーを使う
+            特定のエンドポイントに別のキーを使う
           </label>
 
           {showKeyOverrides && (
@@ -222,7 +288,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* --- ダウンロードボタン --- */}
         <button
           onClick={handleDownload}
           disabled={isLoading}
