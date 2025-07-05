@@ -74,82 +74,92 @@ export default function Home() {
     setIsLoading(true)
     const loadingToastId = toast.loading('コンテンツを取得・圧縮中です...')
 
-    try {
-      const zip = new JSZip()
+    // 最低5秒待機するためのタイマーPromise
+    const timerPromise = new Promise((resolve) => setTimeout(resolve, 5000))
 
-      // エンドポイントごとにループ処理
-      for (const endpoint of endpoints) {
-        // 1. 使用するAPIキーを決定
-        const apiKey =
-          keyMappings.find((m) => m.endpoint === endpoint)?.key || defaultApiKey
-        if (!apiKey) {
-          toast.error(`${endpoint}用のAPIキーがありません。`, {
-            id: loadingToastId,
+    // 実際のダウンロード処理Promise
+    // 成功した場合、{ blob, fileName } を返すように変更
+    const downloadLogicPromise = (async () => {
+      try {
+        const zip = new JSZip()
+
+        for (const endpoint of endpoints) {
+          const apiKey =
+            keyMappings.find((m) => m.endpoint === endpoint)?.key ||
+            defaultApiKey
+          if (!apiKey) {
+            throw new Error(`${endpoint}用のAPIキーがありません。`)
+          }
+          const client = createClient({
+            serviceDomain: serviceId,
+            apiKey: apiKey,
           })
-          continue
+          const allContents = await client.getAllContents<Content>({ endpoint })
+          if (allContents.length === 0) continue
+          const contentsForCsv = allContents.map((content) => {
+            const newContent = { ...content }
+            for (const key in newContent) {
+              if (
+                typeof newContent[key] === 'object' &&
+                newContent[key] !== null
+              ) {
+                newContent[key] = JSON.stringify(newContent[key])
+              }
+            }
+            return newContent
+          })
+          const allKeys = new Set<string>()
+          contentsForCsv.forEach((item) => {
+            Object.keys(item).forEach((key) => allKeys.add(key))
+          })
+          const header = Array.from(allKeys)
+          const csv = Papa.unparse(contentsForCsv, { columns: header })
+          zip.file(`${endpoint}.csv`, csv)
         }
 
-        // 2. microCMSクライアントをブラウザで直接作成
-        const client = createClient({
-          serviceDomain: serviceId,
-          apiKey: apiKey,
-        })
+        const zipContent = await zip.generateAsync({ type: 'blob' })
+        if (zipContent.size === 0) {
+          throw new Error('ダウンロード対象のコンテンツがありませんでした。')
+        }
 
-        // 3. 全コンテンツを取得
-        const allContents = await client.getAllContents<Content>({ endpoint })
-        if (allContents.length === 0) continue
-
-        // 4. ネストされたオブジェクト等をJSON文字列に変換
-        const contentsForCsv = allContents.map((content) => {
-          const newContent = { ...content }
-          for (const key in newContent) {
-            if (
-              typeof newContent[key] === 'object' &&
-              newContent[key] !== null
-            ) {
-              newContent[key] = JSON.stringify(newContent[key])
-            }
-          }
-          return newContent
-        })
-
-        // 5. CSVヘッダーを動的に作成
-        const allKeys = new Set<string>()
-        contentsForCsv.forEach((item) => {
-          Object.keys(item).forEach((key) => allKeys.add(key))
-        })
-        const header = Array.from(allKeys)
-
-        // 6. JSONをCSVに変換
-        const csv = Papa.unparse(contentsForCsv, { columns: header })
-
-        // 7. CSVをZIPファイルに追加
-        zip.file(`${endpoint}.csv`, csv)
+        // ファイル名とBlobを結果として返す
+        return {
+          blob: zipContent,
+          fileName: `microcms-export_${
+            new Date().toISOString().split('T')[0]
+          }.zip`,
+        }
+      } catch (error) {
+        // エラーはPromise.rejectで包んで、外のcatchブロックに渡す
+        throw error
       }
+    })()
 
-      // 8. ZIPファイルを生成
-      const zipContent = await zip.generateAsync({ type: 'blob' })
-      if (zipContent.size === 0) {
-        toast.error('ダウンロード対象のコンテンツがありませんでした。', {
-          id: loadingToastId,
-        })
-        setIsLoading(false)
-        return
+    try {
+      // 両方のPromiseが完了するのを待つ
+      const [downloadResult] = await Promise.all([
+        downloadLogicPromise,
+        timerPromise,
+      ])
+
+      // ダウンロード処理が成功した場合のみトーストとダウンロードを実行
+      if (downloadResult) {
+        // 先に成功トーストを表示
+        toast.success('ダウンロードが完了しました！', { id: loadingToastId })
+
+        // トーストが表示されるのを待つため、少しだけ遅延させる
+        setTimeout(() => {
+          // ダウンロードリンクを生成してクリック
+          const url = window.URL.createObjectURL(downloadResult.blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = downloadResult.fileName
+          document.body.appendChild(a)
+          a.click()
+          a.remove()
+          window.URL.revokeObjectURL(url)
+        }, 100) // 100ミリ秒の遅延
       }
-
-      // 9. ダウンロードリンクを生成してクリック
-      const url = window.URL.createObjectURL(zipContent)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `microcms-export_${
-        new Date().toISOString().split('T')[0]
-      }.zip`
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      window.URL.revokeObjectURL(url)
-
-      toast.success('ダウンロードが完了しました！', { id: loadingToastId })
     } catch (error: any) {
       console.error(error)
       const errorMessage = error.message || 'エラーが発生しました。'
