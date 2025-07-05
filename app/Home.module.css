@@ -14,7 +14,7 @@
 }
 
 .input {
-  padding: 10px;
+  padding: 10px 40px 10px 10px; /* 右側に余白を追加 */
   background-color: var(--input-bg-color);
   color: var(--text-color);
   border: 1px solid var(--input-border-color);
@@ -128,4 +128,28 @@
   margin: 0;
   line-height: 1.6;
   color: var(--info-text-color);
+}
+
+/* 以下の新しいスタイルをファイル末尾などに追加 */
+.inputWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.keyToggleButton {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  font-size: 1.2em;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

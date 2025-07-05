@@ -20,7 +20,6 @@ type Content = { id: string } & MicroCMSContentId &
   MicroCMSDate & { [key: string]: any }
 
 export default function Home() {
-  // --- State管理 ---
   const [serviceId, setServiceId] = useState('')
   const [endpoints, setEndpoints] = useState<string[]>([])
   const [currentEndpoint, setCurrentEndpoint] = useState('')
@@ -28,6 +27,10 @@ export default function Home() {
   const [showKeyOverrides, setShowKeyOverrides] = useState(false)
   const [keyMappings, setKeyMappings] = useState<KeyMapping[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [showDefaultKey, setShowDefaultKey] = useState(false) // Default key visibility
+  const [showMappedKeys, setShowMappedKeys] = useState<Record<number, boolean>>(
+    {}
+  )
 
   // --- UI操作ハンドラ ---
   const handleAddEndpoint = () => {
@@ -170,6 +173,7 @@ export default function Home() {
           複数のエンドポイントからコンテンツを一括で取得し、ZIP形式でダウンロードします。
         </p>
 
+        {/* --- Service ID Input --- */}
         <div className={styles.formSection}>
           <label htmlFor="serviceId">サービスID:</label>
           <input
@@ -179,9 +183,11 @@ export default function Home() {
             onChange={(e) => setServiceId(e.target.value)}
             disabled={isLoading}
             className={styles.input}
+            style={{ paddingRight: '10px' }} // This one doesn't need a button
           />
         </div>
 
+        {/* --- Endpoints Input --- */}
         <div className={styles.formSection}>
           <label htmlFor="endpoints">APIエンドポイント (Enterで追加):</label>
           <div className={styles.tagContainer}>
@@ -207,19 +213,33 @@ export default function Home() {
             }
             disabled={isLoading}
             className={styles.input}
+            style={{ paddingRight: '10px' }} // This one doesn't need a button
           />
         </div>
 
+        {/* --- Default API Key Input with Toggle Button --- */}
         <div className={styles.formSection}>
           <label htmlFor="defaultApiKey">デフォルトAPIキー:</label>
-          <input
-            id="defaultApiKey"
-            type="password"
-            value={defaultApiKey}
-            onChange={(e) => setDefaultApiKey(e.target.value)}
-            disabled={isLoading}
-            className={styles.input}
-          />
+          <div className={styles.inputWrapper}>
+            <input
+              id="defaultApiKey"
+              type={showDefaultKey ? 'text' : 'password'}
+              value={defaultApiKey}
+              onChange={(e) => setDefaultApiKey(e.target.value)}
+              disabled={isLoading}
+              className={styles.input}
+            />
+            <button
+              type="button"
+              onClick={() => setShowDefaultKey(!showDefaultKey)}
+              className={styles.keyToggleButton}
+              aria-label="APIキーの表示を切り替える"
+            >
+              <span className="material-icons" style={{ fontSize: '20px' }}>
+                {showDefaultKey ? 'visibility' : 'visibility_off'}
+              </span>
+            </button>
+          </div>
         </div>
 
         <div className={styles.infoBox}>
@@ -233,6 +253,7 @@ export default function Home() {
           </p>
         </div>
 
+        {/* --- Individual Key Overrides Section --- */}
         <div className={styles.formSection}>
           <label
             style={{
@@ -262,17 +283,40 @@ export default function Home() {
                       updateKeyMapping(mapping.id, 'endpoint', e.target.value)
                     }
                     className={styles.input}
+                    style={{ paddingRight: '10px' }}
                   />
-                  <input
-                    type="password"
-                    placeholder="対応するAPIキー"
-                    value={mapping.key}
-                    onChange={(e) =>
-                      updateKeyMapping(mapping.id, 'key', e.target.value)
-                    }
-                    className={styles.input}
-                    style={{ flexGrow: 1 }}
-                  />
+                  {/* --- Mapped API Key Input with Toggle Button --- */}
+                  <div className={styles.inputWrapper} style={{ flexGrow: 1 }}>
+                    <input
+                      type={showMappedKeys[mapping.id] ? 'text' : 'password'}
+                      placeholder="対応するAPIキー"
+                      value={mapping.key}
+                      onChange={(e) =>
+                        updateKeyMapping(mapping.id, 'key', e.target.value)
+                      }
+                      className={styles.input}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowMappedKeys((prev) => ({
+                          ...prev,
+                          [mapping.id]: !prev[mapping.id],
+                        }))
+                      }
+                      className={styles.keyToggleButton}
+                      aria-label="APIキーの表示を切り替える"
+                    >
+                      <span
+                        className="material-icons"
+                        style={{ fontSize: '20px' }}
+                      >
+                        {showMappedKeys[mapping.id]
+                          ? 'visibility'
+                          : 'visibility_off'}
+                      </span>
+                    </button>
+                  </div>
                   <button
                     onClick={() => removeKeyMapping(mapping.id)}
                     className={styles.removeRowButton}
