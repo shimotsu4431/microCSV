@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import Papa from 'papaparse'
-
-// レートリミット対策で、リクエスト間に待機時間を入れる関数
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+import { createClient } from 'microcms-js-sdk'
 
 // microCMSの型定義（必要に応じてカスタマイズしてください）
 type Content = {
@@ -13,13 +11,6 @@ type Content = {
   revisedAt: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any // 他のフィールド
-}
-
-type ListApiResponse = {
-  contents: Content[]
-  totalCount: number
-  offset: number
-  limit: number
 }
 
 // POSTリクエストを処理する関数をエクスポート
@@ -34,48 +25,26 @@ export async function POST(req: Request) {
       )
     }
 
-    const allContents: Content[] = []
-    const limit = 100 // microCMSのlimit最大値
-    let offset = 0
-    let totalCount = 0
+    const client = createClient({
+      serviceDomain: serviceId,
+      apiKey: apiKey,
+    })
 
-    const headers = {
-      'X-MICROCMS-API-KEY': apiKey,
-    }
+    const allContents = await client.getAllContents<Content>({ endpoint })
 
-    // 最初にtotalCountを取得するための初回リクエスト
-    const firstUrl = `https://${serviceId}.microcms.io/api/v1/${endpoint}?limit=${limit}&offset=${offset}`
-    const firstRes = await fetch(firstUrl, { headers })
-
-    if (!firstRes.ok) {
-      return NextResponse.json(
-        { message: `Failed to fetch: ${firstRes.statusText}` },
-        { status: firstRes.status }
-      )
-    }
-
-    const firstData: ListApiResponse = await firstRes.json()
-    allContents.push(...firstData.contents)
-    totalCount = firstData.totalCount
-    offset += limit
-
-    // totalCountを元に残りのコンテンツを並行で取得
-    const promises = []
-    while (offset < totalCount) {
-      const url = `https://${serviceId}.microcms.io/api/v1/${endpoint}?limit=${limit}&offset=${offset}`
-      promises.push(fetch(url, { headers }).then((res) => res.json()))
-      offset += limit
-      // レートリミット対策
-      await sleep(50)
-    }
-
-    const responses = await Promise.all(promises)
-    for (const data of responses) {
-      allContents.push(...data.contents)
-    }
+    // オブジェクトをJSON文字列に変換
+    const contentsForCsv = allContents.map((content) => {
+      const newContent = { ...content }
+      for (const key in newContent) {
+        if (typeof newContent[key] === 'object' && newContent[key] !== null) {
+          newContent[key] = JSON.stringify(newContent[key])
+        }
+      }
+      return newContent
+    })
 
     // JSONをCSVに変換
-    const csv = Papa.unparse(allContents)
+    const csv = Papa.unparse(contentsForCsv)
 
     // CSVをレスポンスとして返す
     const responseHeaders = new Headers()
