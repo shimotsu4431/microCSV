@@ -9,6 +9,15 @@ export default function Home() {
   const [endpoint, setEndpoint] = useState('')
   const [apiKey, setApiKey] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [showApiKey, setShowApiKey] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(apiKey)
+    setIsCopied(true)
+    toast.success('APIキーをコピーしました！')
+    setTimeout(() => setIsCopied(false), 2000) // 2秒後に「コピーしました」をリセット
+  }
 
   // handleDownload関数は変更なし
 
@@ -135,23 +144,67 @@ export default function Home() {
           </div>
           <div>
             <label htmlFor="apiKey">APIキー:</label>
-            <input
-              id="apiKey"
-              type="password"
-              placeholder="X-MICROCMS-API-KEY"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              disabled={isLoading}
-              style={{
-                padding: '10px',
-                backgroundColor: 'var(--input-bg-color)',
-                color: 'var(--text-color)',
-                border: '1px solid var(--input-border-color)',
-                borderRadius: '5px',
-                width: '100%',
-                boxSizing: 'border-box',
-              }}
-            />
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                id="apiKey"
+                type={showApiKey ? 'text' : 'password'}
+                placeholder="X-MICROCMS-API-KEY"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                disabled={isLoading}
+                style={{
+                  padding: '10px 80px 10px 10px', /* Adjust padding for icons */
+                  backgroundColor: 'var(--input-bg-color)',
+                  color: 'var(--text-color)',
+                  border: '1px solid var(--input-border-color)',
+                  borderRadius: '5px',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowApiKey(!showApiKey)}
+                disabled={isLoading}
+                style={{
+                  position: 'absolute',
+                  right: '45px', /* Position for eye icon */
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--text-color)',
+                  fontSize: '1.2em',
+                  padding: '5px',
+                }}
+              >
+                <span className="material-icons">
+                  {showApiKey ? 'visibility' : 'visibility_off'}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={handleCopy}
+                disabled={isLoading || !apiKey}
+                style={{
+                  position: 'absolute',
+                  right: '10px', /* Position for copy icon */
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: isCopied ? '#28a745' : 'var(--text-color)',
+                  fontSize: '1.2em',
+                  padding: '5px',
+                }}
+              >
+                <span className="material-icons">
+                  {isCopied ? 'check' : 'content_copy'}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 
