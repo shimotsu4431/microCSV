@@ -1,0 +1,131 @@
+.main {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input {
+  padding: 10px;
+  background-color: var(--input-bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--input-border-color);
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 1em;
+}
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background-color: var(--info-bg-color);
+  border: 1px solid var(--info-border-color);
+  border-radius: 5px;
+  font-size: 0.9em;
+}
+
+.tagRemoveButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  padding: 0;
+  line-height: 1;
+  font-weight: bold;
+}
+
+.overridesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 16px;
+  border: 1px solid var(--info-border-color);
+  border-radius: 5px;
+}
+
+.mappingRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.addRowButton {
+  align-self: flex-start;
+  padding: 8px 12px;
+  background: var(--info-bg-color);
+  border: 1px solid var(--info-border-color);
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+.removeRowButton {
+  padding: 8px;
+  background: #c0392b; /* 少し落ち着いた赤色に */
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.downloadButton {
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  border-radius: 5px;
+}
+
+/* :disabled 疑似クラスで非活性時のスタイルを指定 */
+.downloadButton:disabled {
+  background-color: var(--button-disabled-bg-color);
+  cursor: not-allowed;
+}
+
+/* ファイルの末尾などに追記 */
+.infoBox {
+  border: 1px solid var(--info-border-color);
+  background-color: var(--info-bg-color);
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.infoBox h4 {
+  margin-top: 0;
+  margin-bottom: 0.5em;
+}
+
+.infoBox p {
+  font-size: 0.9em;
+  margin: 0;
+  line-height: 1.6;
+  color: var(--info-text-color);
+}

@@ -1,79 +1,99 @@
 import { NextResponse } from 'next/server'
 import Papa from 'papaparse'
 import { createClient } from 'microcms-js-sdk'
+import JSZip from 'jszip'
 
-// microCMSの型定義（必要に応じてカスタマイズしてください）
-type Content = {
-  id: string
-  createdAt: string
-  updatedAt: string
-  publishedAt: string
-  revisedAt: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any // 他のフィールド
-}
+// 型定義
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Content = { id: string; [key: string]: any }
+type KeyMapping = { endpoint: string; key: string }
 
-// POSTリクエストを処理する関数をエクスポート
 export async function POST(req: Request) {
   try {
-    const { serviceId, endpoint, apiKey } = await req.json()
+    // フロントエンドから送信されるデータ構造
+    const {
+      serviceId,
+      endpoints,
+      defaultApiKey,
+      keyMappings,
+    }: {
+      serviceId: string
+      endpoints: string[]
+      defaultApiKey: string
+      keyMappings: KeyMapping[]
+    } = await req.json()
 
-    if (!serviceId || !endpoint || !apiKey) {
+    // バリデーション
+    if (!serviceId || !endpoints || !endpoints.length || !defaultApiKey) {
       return NextResponse.json(
-        { message: 'Missing required parameters.' },
+        { message: '必須項目が不足しています。' },
         { status: 400 }
       )
     }
 
-    const client = createClient({
-      serviceDomain: serviceId,
-      apiKey: apiKey,
-    })
+    const zip = new JSZip()
 
-    // 最低でも3秒待機する
-    await new Promise((resolve) => setTimeout(resolve, 3000))
+    // エンドポイントごとにループ処理
+    for (const endpoint of endpoints) {
+      // 1. 使用するAPIキーを決定
+      const apiKey =
+        keyMappings.find((m) => m.endpoint === endpoint)?.key || defaultApiKey
 
-    const allContents = await client.getAllContents<Content>({ endpoint })
-
-    // オブジェクトをJSON文字列に変換
-    const contentsForCsv = allContents.map((content) => {
-      const newContent = { ...content }
-      for (const key in newContent) {
-        if (typeof newContent[key] === 'object' && newContent[key] !== null) {
-          newContent[key] = JSON.stringify(newContent[key])
-        }
-      }
-      return newContent
-    })
-
-    // すべてのキーを収集してヘッダーを作成
-    const allKeys = new Set<string>()
-    contentsForCsv.forEach((item) => {
-      Object.keys(item).forEach((key) => {
-        allKeys.add(key)
+      // 2. microCMSクライアントを作成
+      const client = createClient({
+        serviceDomain: serviceId,
+        apiKey: apiKey,
       })
-    })
-    const header = Array.from(allKeys)
 
-    // JSONをCSVに変換
-    const csv = Papa.unparse(contentsForCsv, { columns: header })
+      // 3. 全コンテンツを取得
+      const allContents = await client.getAllContents<Content>({ endpoint })
 
-    // CSVをレスポンスとして返す
+      if (allContents.length === 0) continue // コンテンツがなければスキップ
+
+      // 4. ネストされたオブジェクトをJSON文字列に変換
+      const contentsForCsv = allContents.map((content) => {
+        const newContent = { ...content }
+        for (const key in newContent) {
+          if (typeof newContent[key] === 'object' && newContent[key] !== null) {
+            newContent[key] = JSON.stringify(newContent[key])
+          }
+        }
+        return newContent
+      })
+
+      // 5. CSVヘッダーを動的に作成
+      const allKeys = new Set<string>()
+      contentsForCsv.forEach((item) => {
+        Object.keys(item).forEach((key) => allKeys.add(key))
+      })
+      const header = Array.from(allKeys)
+
+      // 6. JSONをCSVに変換
+      const csv = Papa.unparse(contentsForCsv, { columns: header })
+
+      // 7. CSVをZIPファイルに追加
+      zip.file(`${endpoint}.csv`, csv)
+    }
+
+    // ZIPファイルを生成
+    const zipContent = await zip.generateAsync({ type: 'nodebuffer' })
+
+    // ZIPファイルをレスポンスとして返す
     const responseHeaders = new Headers()
-    responseHeaders.set('Content-Type', 'text/csv')
+    responseHeaders.set('Content-Type', 'application/zip')
     responseHeaders.set(
       'Content-Disposition',
-      `attachment; filename="${endpoint}_${
+      `attachment; filename="microcms-export_${
         new Date().toISOString().split('T')[0]
-      }.csv"`
+      }.zip"`
     )
 
-    return new Response(csv, { headers: responseHeaders })
-  } catch (error) {
+    return new Response(zipContent, { headers: responseHeaders })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     console.error(error)
-    return NextResponse.json(
-      { message: 'An internal server error occurred.' },
-      { status: 500 }
-    )
+    // エラーメッセージをより具体的に返す
+    const errorMessage = error.message || 'An internal server error occurred.'
+    return NextResponse.json({ message: errorMessage }, { status: 500 })
   }
 }

@@ -3,230 +3,169 @@
 import { useState } from 'react'
 import Head from 'next/head'
 import { Toaster, toast } from 'react-hot-toast'
+import styles from './Home.module.css' // CSSモジュールをインポート
+
+// 型定義
+type KeyMapping = {
+  id: number
+  endpoint: string
+  key: string
+}
 
 export default function Home() {
+  // State管理とハンドラ関数は変更なし
   const [serviceId, setServiceId] = useState('')
-  const [endpoint, setEndpoint] = useState('')
-  const [apiKey, setApiKey] = useState('')
+  const [endpoints, setEndpoints] = useState<string[]>([])
+  const [currentEndpoint, setCurrentEndpoint] = useState('')
+  const [defaultApiKey, setDefaultApiKey] = useState('')
+  const [showKeyOverrides, setShowKeyOverrides] = useState(false)
+  const [keyMappings, setKeyMappings] = useState<KeyMapping[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [showApiKey, setShowApiKey] = useState(false)
-  const [isCopied, setIsCopied] = useState(false)
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(apiKey)
-    setIsCopied(true)
-    toast.success('APIキーをコピーしました！')
-    setTimeout(() => setIsCopied(false), 2000) // 2秒後に「コピーしました」をリセット
+  const handleAddEndpoint = () => {
+    if (currentEndpoint && !endpoints.includes(currentEndpoint)) {
+      setEndpoints([...endpoints, currentEndpoint])
+      setCurrentEndpoint('')
+    }
   }
 
-  // handleDownload関数は変更なし
+  const handleRemoveEndpoint = (endpointToRemove: string) => {
+    setEndpoints(endpoints.filter((endpoint) => endpoint !== endpointToRemove))
+  }
 
-  // ... handleDownload
+  const addKeyMapping = () => {
+    setKeyMappings([...keyMappings, { id: Date.now(), endpoint: '', key: '' }])
+  }
+
+  const removeKeyMapping = (id: number) => {
+    setKeyMappings(keyMappings.filter((mapping) => mapping.id !== id))
+  }
+
+  const updateKeyMapping = (
+    id: number,
+    field: 'endpoint' | 'key',
+    value: string
+  ) => {
+    setKeyMappings(
+      keyMappings.map((mapping) =>
+        mapping.id === id ? { ...mapping, [field]: value } : mapping
+      )
+    )
+  }
+
   const handleDownload = async () => {
-    if (!serviceId || !endpoint || !apiKey) {
-      toast.error('すべての必須項目を入力してください。')
+    if (!serviceId || endpoints.length === 0 || !defaultApiKey) {
+      toast.error('サービスID、エンドポイント、デフォルトAPIキーは必須です。')
       return
     }
-
     setIsLoading(true)
-    const loadingToastId = toast.loading('コンテンツを取得中です...')
-
+    const loadingToastId = toast.loading('コンテンツを取得・圧縮中です...')
     try {
       const res = await fetch('/api/download', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ serviceId, endpoint, apiKey }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          serviceId,
+          endpoints,
+          defaultApiKey,
+          keyMappings: keyMappings.map(({ id, ...rest }) => rest),
+        }),
       })
-
       if (!res.ok) {
         const errorData = await res.json()
         throw new Error(errorData.message || 'ダウンロードに失敗しました。')
       }
-
-      // ファイルをBlobとして取得し、ダウンロードリンクを生成してクリック
       const blob = await res.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      // ファイル名はサーバーサイドで設定済み
       a.download =
         res.headers
           .get('Content-Disposition')
           ?.split('filename=')[1]
-          .replace(/"/g, '') || 'contents.csv'
+          .replace(/"/g, '') || 'export.zip'
       document.body.appendChild(a)
       a.click()
       a.remove()
       window.URL.revokeObjectURL(url)
-
       toast.success('ダウンロードが完了しました！', { id: loadingToastId })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message, { id: loadingToastId })
     } finally {
       setIsLoading(false)
     }
   }
-  // ...
 
   return (
     <>
       <Head>
-        <title>microCMS CSV Downloader</title>
-        <meta
-          name="description"
-          content="Download contents from microCMS as CSV"
-        />
-        <link rel="icon" href="/favicon.ico" />
+        <title>microCMS Exporter</title>
       </Head>
-
       <Toaster position="top-right" />
 
-      {/* 👇 styleをCSS変数を使うように変更 */}
-      <main
-        style={{
-          maxWidth: '600px',
-          margin: '40px auto',
-          padding: '20px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-        }}
-      >
-        <h1>microCMS CSV Exporter</h1>
-
+      <main className={styles.main}>
+        <h1>microCMS Exporter</h1>
         <p>
-          サービスID、APIエンドポイント、APIキーを入力して、コンテンツをCSV形式でダウンロードします。
+          複数のエンドポイントからコンテンツを一括で取得し、ZIP形式でダウンロードします。
         </p>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <div>
-            <label htmlFor="serviceId">サービスID:</label>
-            <input
-              id="serviceId"
-              type="text"
-              placeholder="例: your-service-id"
-              value={serviceId}
-              onChange={(e) => setServiceId(e.target.value)}
-              disabled={isLoading}
-              style={{
-                padding: '10px',
-                backgroundColor: 'var(--input-bg-color)',
-                color: 'var(--text-color)',
-                border: '1px solid var(--input-border-color)',
-                borderRadius: '5px',
-                width: '100%',
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-          <div>
-            <label htmlFor="endpoint">APIエンドポイント:</label>
-            <input
-              id="endpoint"
-              type="text"
-              placeholder="例: blogs"
-              value={endpoint}
-              onChange={(e) => setEndpoint(e.target.value)}
-              disabled={isLoading}
-              style={{
-                padding: '10px',
-                backgroundColor: 'var(--input-bg-color)',
-                color: 'var(--text-color)',
-                border: '1px solid var(--input-border-color)',
-                borderRadius: '5px',
-                width: '100%',
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-          <div>
-            <label htmlFor="apiKey">APIキー:</label>
-            <div style={{ position: 'relative', width: '100%' }}>
-              <input
-                id="apiKey"
-                type={showApiKey ? 'text' : 'password'}
-                placeholder="X-MICROCMS-API-KEY"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                disabled={isLoading}
-                style={{
-                  padding: '10px 80px 10px 10px', /* Adjust padding for icons */
-                  backgroundColor: 'var(--input-bg-color)',
-                  color: 'var(--text-color)',
-                  border: '1px solid var(--input-border-color)',
-                  borderRadius: '5px',
-                  width: '100%',
-                  boxSizing: 'border-box',
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowApiKey(!showApiKey)}
-                disabled={isLoading}
-                style={{
-                  position: 'absolute',
-                  right: '45px', /* Position for eye icon */
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--text-color)',
-                  fontSize: '1.2em',
-                  padding: '5px',
-                }}
-              >
-                <span className="material-icons">
-                  {showApiKey ? 'visibility' : 'visibility_off'}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={handleCopy}
-                disabled={isLoading || !apiKey}
-                style={{
-                  position: 'absolute',
-                  right: '10px', /* Position for copy icon */
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: isCopied ? '#28a745' : 'var(--text-color)',
-                  fontSize: '1.2em',
-                  padding: '5px',
-                }}
-              >
-                <span className="material-icons">
-                  {isCopied ? 'check' : 'content_copy'}
-                </span>
-              </button>
-            </div>
-          </div>
+        {/* --- 入力フォーム --- */}
+        <div className={styles.formSection}>
+          <label htmlFor="serviceId">サービスID:</label>
+          <input
+            id="serviceId"
+            type="text"
+            value={serviceId}
+            onChange={(e) => setServiceId(e.target.value)}
+            disabled={isLoading}
+            className={styles.input}
+          />
         </div>
 
-        <div
-          style={{
-            border: '1px solid var(--info-border-color)',
-            padding: '15px',
-            borderRadius: '5px',
-            backgroundColor: 'var(--info-bg-color)',
-          }}
-        >
-          <h4 style={{ marginTop: 0 }}>
-            【ご確認ください】 取得できるコンテンツの範囲について
-          </h4>
-          <p
-            style={{
-              fontSize: '0.9em',
-              margin: 0,
-              color: 'var(--info-text-color)',
-            }}
-          >
-            ダウンロードされるコンテンツは、入力するAPIキーの権限設定に依存します。
+        <div className={styles.formSection}>
+          <label htmlFor="endpoints">APIエンドポイント (Enterで追加):</label>
+          <div className={styles.tagContainer}>
+            {endpoints.map((ep) => (
+              <div key={ep} className={styles.tag}>
+                {ep}
+                <button
+                  onClick={() => handleRemoveEndpoint(ep)}
+                  className={styles.tagRemoveButton}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+          <input
+            id="endpoints"
+            type="text"
+            value={currentEndpoint}
+            onChange={(e) => setCurrentEndpoint(e.target.value)}
+            onKeyDown={(e) =>
+              e.key === 'Enter' && (e.preventDefault(), handleAddEndpoint())
+            }
+            disabled={isLoading}
+            className={styles.input}
+          />
+        </div>
+
+        <div className={styles.formSection}>
+          <label htmlFor="defaultApiKey">デフォルトAPIキー:</label>
+          <input
+            id="defaultApiKey"
+            type="password"
+            value={defaultApiKey}
+            onChange={(e) => setDefaultApiKey(e.target.value)}
+            disabled={isLoading}
+            className={styles.input}
+          />
+        </div>
+
+        <div className={styles.infoBox}>
+          <h4>【ご確認ください】 APIキーの権限について</h4>
+          <p>
+            ダウンロードされるコンテンツは、使用するAPIキーの権限設定に依存します。
             <br />- <b>下書き</b>を含めたい場合:
             APIキーの設定で「下書きコンテンツの全取得」にチェックを入れてください。
             <br />- <b>公開終了</b>を含めたい場合:
@@ -234,22 +173,62 @@ export default function Home() {
           </p>
         </div>
 
+        {/* --- 個別キー設定 --- */}
+        <div className={styles.formSection}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <input
+              type="checkbox"
+              checked={showKeyOverrides}
+              onChange={(e) => setShowKeyOverrides(e.target.checked)}
+            />
+            特定のエンドポイントに別のキーを使う
+          </label>
+
+          {showKeyOverrides && (
+            <div className={styles.overridesContainer}>
+              {keyMappings.map((mapping) => (
+                <div key={mapping.id} className={styles.mappingRow}>
+                  <input
+                    type="text"
+                    placeholder="エンドポイント名"
+                    value={mapping.endpoint}
+                    onChange={(e) =>
+                      updateKeyMapping(mapping.id, 'endpoint', e.target.value)
+                    }
+                    className={styles.input}
+                  />
+                  <input
+                    type="password"
+                    placeholder="対応するAPIキー"
+                    value={mapping.key}
+                    onChange={(e) =>
+                      updateKeyMapping(mapping.id, 'key', e.target.value)
+                    }
+                    className={styles.input}
+                    style={{ flexGrow: 1 }}
+                  />
+                  <button
+                    onClick={() => removeKeyMapping(mapping.id)}
+                    className={styles.removeRowButton}
+                  >
+                    -
+                  </button>
+                </div>
+              ))}
+              <button onClick={addKeyMapping} className={styles.addRowButton}>
+                + キー設定を追加
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* --- ダウンロードボタン --- */}
         <button
           onClick={handleDownload}
           disabled={isLoading}
-          style={{
-            padding: '12px 20px',
-            fontSize: '16px',
-            cursor: 'pointer',
-            backgroundColor: isLoading
-              ? 'var(--button-disabled-bg-color)'
-              : 'var(--button-bg-color)',
-            color: 'var(--button-text-color)',
-            border: 'none',
-            borderRadius: '5px',
-          }}
+          className={styles.downloadButton}
         >
-          {isLoading ? '処理中です...' : 'CSVダウンロード'}
+          {isLoading ? '処理中です...' : 'ZIPダウンロード'}
         </button>
       </main>
     </>
