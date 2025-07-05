@@ -200,19 +200,21 @@ export default function Home() {
         {/* --- Endpoints Input --- */}
         <div className={styles.formSection}>
           <label htmlFor="endpoints">APIエンドポイント (Enterで追加):</label>
-          <div className={styles.tagContainer}>
-            {endpoints.map((ep) => (
-              <div key={ep} className={styles.tag}>
-                {ep}
-                <button
-                  onClick={() => handleRemoveEndpoint(ep)}
-                  className={styles.tagRemoveButton}
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-          </div>
+          {endpoints.length > 0 && (
+            <div className={styles.tagContainer}>
+              {endpoints.map((ep) => (
+                <div key={ep} className={styles.tag}>
+                  {ep}
+                  <button
+                    onClick={() => handleRemoveEndpoint(ep)}
+                    className={styles.tagRemoveButton}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
           <input
             id="endpoints"
             type="text"

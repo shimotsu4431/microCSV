@@ -147,3 +147,13 @@
   align-items: center;
   justify-content: center;
 }
+
+.tagRemoveButton {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 1.2em;
+  padding: 0;
+  margin-left: 8px;
+}
