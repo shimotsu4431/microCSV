@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     // totalCountを元に残りのコンテンツを並行で取得
     const promises = []
     while (offset < totalCount) {
-      const url = `https://sot53t1p4c.microcms.io/api/v1/${endpoint}?limit=${limit}&offset=${offset}`
+      const url = `https://${serviceId}.microcms.io/api/v1/${endpoint}?limit=${limit}&offset=${offset}`
       promises.push(fetch(url, { headers }).then((res) => res.json()))
       offset += limit
       // レートリミット対策
