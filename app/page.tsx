@@ -181,7 +181,7 @@ export default function Home() {
               checked={showKeyOverrides}
               onChange={(e) => setShowKeyOverrides(e.target.checked)}
             />
-            特定のエンドポイントに別のキーを使う
+            特定のエンドポイントに別のAPIキーを使う
           </label>
 
           {showKeyOverrides && (
