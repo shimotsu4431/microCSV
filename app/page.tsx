@@ -99,14 +99,14 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>microCMS Exporter</title>
+        <title>microCSV</title>
       </Head>
       <Toaster position="top-right" />
 
       <main className={styles.main}>
-        <h1>microCMS Exporter</h1>
+        <h1>microCSV</h1>
         <p>
-          複数のエンドポイントからコンテンツを一括で取得し、ZIP形式でダウンロードします。
+          microCMSから、複数のエンドポイントを対象にコンテンツを一括で取得し（CSV）、ZIP形式でダウンロードするツールです。
         </p>
 
         {/* --- 入力フォーム --- */}
