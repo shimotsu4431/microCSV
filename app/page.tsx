@@ -93,48 +93,66 @@ export default function Home() {
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <input
-            type="text"
-            placeholder="サービスID (例: your-service-id)"
-            value={serviceId}
-            onChange={(e) => setServiceId(e.target.value)}
-            disabled={isLoading}
-            style={{
-              padding: '10px',
-              backgroundColor: 'var(--input-bg-color)',
-              color: 'var(--text-color)',
-              border: '1px solid var(--input-border-color)',
-              borderRadius: '5px',
-            }}
-          />
-          <input
-            type="text"
-            placeholder="APIエンドポイント (例: blogs)"
-            value={endpoint}
-            onChange={(e) => setEndpoint(e.target.value)}
-            disabled={isLoading}
-            style={{
-              padding: '10px',
-              backgroundColor: 'var(--input-bg-color)',
-              color: 'var(--text-color)',
-              border: '1px solid var(--input-border-color)',
-              borderRadius: '5px',
-            }}
-          />
-          <input
-            type="password"
-            placeholder="APIキー (X-MICROCMS-API-KEY)"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            disabled={isLoading}
-            style={{
-              padding: '10px',
-              backgroundColor: 'var(--input-bg-color)',
-              color: 'var(--text-color)',
-              border: '1px solid var(--input-border-color)',
-              borderRadius: '5px',
-            }}
-          />
+          <div>
+            <label htmlFor="serviceId">サービスID:</label>
+            <input
+              id="serviceId"
+              type="text"
+              placeholder="例: your-service-id"
+              value={serviceId}
+              onChange={(e) => setServiceId(e.target.value)}
+              disabled={isLoading}
+              style={{
+                padding: '10px',
+                backgroundColor: 'var(--input-bg-color)',
+                color: 'var(--text-color)',
+                border: '1px solid var(--input-border-color)',
+                borderRadius: '5px',
+                width: '100%',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+          <div>
+            <label htmlFor="endpoint">APIエンドポイント:</label>
+            <input
+              id="endpoint"
+              type="text"
+              placeholder="例: blogs"
+              value={endpoint}
+              onChange={(e) => setEndpoint(e.target.value)}
+              disabled={isLoading}
+              style={{
+                padding: '10px',
+                backgroundColor: 'var(--input-bg-color)',
+                color: 'var(--text-color)',
+                border: '1px solid var(--input-border-color)',
+                borderRadius: '5px',
+                width: '100%',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+          <div>
+            <label htmlFor="apiKey">APIキー:</label>
+            <input
+              id="apiKey"
+              type="password"
+              placeholder="X-MICROCMS-API-KEY"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              disabled={isLoading}
+              style={{
+                padding: '10px',
+                backgroundColor: 'var(--input-bg-color)',
+                color: 'var(--text-color)',
+                border: '1px solid var(--input-border-color)',
+                borderRadius: '5px',
+                width: '100%',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
         </div>
 
         <div
