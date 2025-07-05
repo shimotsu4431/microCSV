@@ -11,6 +11,7 @@ type Content = {
   updatedAt: string
   publishedAt: string
   revisedAt: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any // 他のフィールド
 }
 
