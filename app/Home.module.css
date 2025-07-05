@@ -42,14 +42,23 @@
   font-size: 0.9em;
 }
 
-.tagRemoveButton {
+.removeRowButton {
   background: none;
   border: none;
-  cursor: pointer;
+  border-radius: 50%;
   color: var(--text-color);
-  padding: 0;
-  line-height: 1;
-  font-weight: bold;
+  cursor: pointer;
+  width: 36px; /* 少し大きくしてクリックしやすく */
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s; /* ホバー時のアニメーション */
+}
+
+/* ホバー時のスタイルを追加 */
+.removeRowButton:hover {
+  opacity: 0.8;
 }
 
 .overridesContainer {
@@ -76,21 +85,6 @@
   border-radius: 5px;
   cursor: pointer;
   color: var(--text-color);
-}
-
-.removeRowButton {
-  padding: 8px;
-  background: #c0392b; /* 少し落ち着いた赤色に */
-  color: white;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
 }
 
 .downloadButton {

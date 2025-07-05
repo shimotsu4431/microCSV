@@ -330,8 +330,9 @@ export default function Home() {
                   <button
                     onClick={() => removeKeyMapping(mapping.id)}
                     className={styles.removeRowButton}
+                    aria-label="このキー設定を削除"
                   >
-                    -
+                    <span className="material-icons">delete</span>
                   </button>
                 </div>
               ))}
