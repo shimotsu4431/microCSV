@@ -30,6 +30,9 @@ export async function POST(req: Request) {
       apiKey: apiKey,
     })
 
+    // 最低でも3秒待機する
+    await new Promise((resolve) => setTimeout(resolve, 3000))
+
     const allContents = await client.getAllContents<Content>({ endpoint })
 
     // オブジェクトをJSON文字列に変換
@@ -43,8 +46,17 @@ export async function POST(req: Request) {
       return newContent
     })
 
+    // すべてのキーを収集してヘッダーを作成
+    const allKeys = new Set<string>()
+    contentsForCsv.forEach((item) => {
+      Object.keys(item).forEach((key) => {
+        allKeys.add(key)
+      })
+    })
+    const header = Array.from(allKeys)
+
     // JSONをCSVに変換
-    const csv = Papa.unparse(contentsForCsv)
+    const csv = Papa.unparse(contentsForCsv, { columns: header })
 
     // CSVをレスポンスとして返す
     const responseHeaders = new Headers()
