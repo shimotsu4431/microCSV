@@ -213,9 +213,29 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1>microCMS Exporter</h1>
+        <div className={styles.overview}>
+          <p>
+            このツールでは、microCMSのコンテンツデータを一括で取得し、CSV形式のファイルとしてZIPでダウンロードします。
+            <br />
+            <strong>
+              APIキーなどの情報は外部に送信されず、すべての処理はあなたのブラウザ内で完結するため安全です。
+            </strong>
+          </p>
+          <p>
+            なお、本ツールはOSSとして公開されており、GitHubでソースコードを確認できます。
+            <br />
+            リポジトリ:{' '}
+            <a
+              href="https://github.com/shimotsu4431/microcms-downloader-tool"
+              target="_blank"
+            >
+              https://github.com/shimotsu4431/microcms-downloader-tool
+            </a>
+          </p>
+        </div>
 
         <div className={styles.exportSection}>
-          <h3>共通設定</h3>
+          <h2>共通設定</h2>
           <div className={styles.formSection}>
             <label htmlFor="serviceId">サービスID:</label>
             <input
@@ -358,7 +378,7 @@ export default function Home() {
         </div>
 
         <div className={styles.exportSection}>
-          <h3>エクスポート対象</h3>
+          <h3>エクスポートするAPI</h3>
           <div className={styles.formSection}>
             <label htmlFor="list-endpoints">
               リスト形式APIのエンドポイント (Enterで追加):

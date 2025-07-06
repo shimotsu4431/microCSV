@@ -7,6 +7,27 @@
   gap: 24px;
 }
 
+.overview p {
+  margin-bottom: 15px;
+}
+
+.overview p a {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+.usageList {
+  padding: 16px;
+  padding-left: 32px; /* 番号が見えるように左に余白を追加 */
+  border: 1px solid var(--info-border-color);
+  background-color: var(--info-bg-color);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.9em;
+}
+
 .formSection {
   display: flex;
   flex-direction: column;
@@ -194,7 +215,7 @@
 
   p {
     a {
-      color: blue;
+      color: var(--link-color);
       text-decoration: underline;
     }
 
