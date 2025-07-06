@@ -413,8 +413,16 @@ export default function Home() {
           disabled={isLoading}
           className={styles.downloadButton}
         >
-          {isLoading ? '処理中です...' : 'まとめてZIPダウンロード'}
+          {isLoading ? '処理中です...' : 'CSVファイルをダウンロード'}
         </button>
+        <div className={styles.makerInfo}>
+          <p>
+            作者:{' '}
+            <a href="https://x.com/shimotsu_" target="blank_">
+              @shimotsu_
+            </a>
+          </p>
+        </div>
       </main>
     </>
   )
