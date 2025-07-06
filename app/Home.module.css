@@ -213,8 +213,7 @@
 
 /* ファイルの末尾などに追加 */
 .exportSection {
-  padding: 16px;
-  border: 1px solid var(--info-border-color);
+  margin-top: 20px;
   border-radius: 5px;
   display: flex;
   flex-direction: column;

@@ -254,7 +254,9 @@ export default function Home() {
         <div className={styles.exportSection}>
           <h2>共通設定</h2>
           <div className={styles.formSection}>
-            <label htmlFor="serviceId">サービスID:</label>
+            <label htmlFor="serviceId">
+              サービスID（https://xxxx.microcms.io の xxxxの部分）
+            </label>
             <input
               id="serviceId"
               type="text"
@@ -266,7 +268,7 @@ export default function Home() {
             />
           </div>
           <div className={styles.formSection}>
-            <label htmlFor="defaultApiKey">デフォルトAPIキー:</label>
+            <label htmlFor="defaultApiKey">APIキー</label>
             <div className={styles.inputWrapper}>
               <input
                 id="defaultApiKey"
@@ -327,7 +329,7 @@ export default function Home() {
                 checked={showKeyOverrides}
                 onChange={(e) => setShowKeyOverrides(e.target.checked)}
               />
-              特定のエンドポイントに別のキーを使う
+              特定のエンドポイントに別のAPIキーを使う
             </label>
             {showKeyOverrides && (
               <div className={styles.overridesContainer}>
@@ -380,14 +382,14 @@ export default function Home() {
                     <button
                       onClick={() => removeKeyMapping(mapping.id)}
                       className={styles.removeRowButton}
-                      aria-label="このキー設定を削除"
+                      aria-label="このAPIキーを削除"
                     >
                       <span className="material-icons">delete</span>
                     </button>
                   </div>
                 ))}
                 <button onClick={addKeyMapping} className={styles.addRowButton}>
-                  + キー設定を追加
+                  + APIキーを追加
                 </button>
               </div>
             )}
@@ -398,7 +400,7 @@ export default function Home() {
           <h2>エクスポートするAPI</h2>
           <div className={styles.formSection}>
             <label htmlFor="list-endpoints">
-              リスト形式APIのエンドポイント (Enterで追加):
+              リスト形式APIのエンドポイント (Enterで追加)
             </label>
             {listEndpoints.length > 0 && (
               <div className={styles.tagContainer}>
@@ -432,7 +434,7 @@ export default function Home() {
 
           <div className={styles.formSection}>
             <label htmlFor="object-endpoints">
-              オブジェクト形式APIのエンドポイント (Enterで追加):
+              オブジェクト形式APIのエンドポイント (Enterで追加)
             </label>
             {objectEndpoints.length > 0 && (
               <div className={styles.tagContainer}>
