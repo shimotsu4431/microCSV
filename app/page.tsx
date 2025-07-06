@@ -234,6 +234,23 @@ export default function Home() {
           </p>
         </div>
 
+        <div className={styles.usageList}>
+          <h4>基本的な使い方</h4>
+          <ol>
+            <li>
+              <b>共通設定</b>
+              に、あなたのmicroCMSのサービスIDとAPIキーを入力します
+            </li>
+            <li>
+              <b>エクスポートするAPI</b>
+              に、ダウンロードしたいAPIのエンドポイント名を入力します（Enterで追加）
+            </li>
+            <li>
+              ［CSVファイルをダウンロード］をクリックすると、処理が開始されます
+            </li>
+          </ol>
+        </div>
+
         <div className={styles.exportSection}>
           <h2>共通設定</h2>
           <div className={styles.formSection}>
@@ -378,7 +395,7 @@ export default function Home() {
         </div>
 
         <div className={styles.exportSection}>
-          <h3>エクスポートするAPI</h3>
+          <h2>エクスポートするAPI</h2>
           <div className={styles.formSection}>
             <label htmlFor="list-endpoints">
               リスト形式APIのエンドポイント (Enterで追加):
