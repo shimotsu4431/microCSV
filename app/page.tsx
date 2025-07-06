@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Head from 'next/head'
 import { Toaster, toast } from 'react-hot-toast'
 import { createClient } from 'microcms-js-sdk'
 import JSZip from 'jszip'
@@ -23,6 +22,7 @@ import {
   Loader,
   SimpleGrid,
   Badge,
+  Kbd,
 } from '@mantine/core'
 import {
   IconInfoCircle,
@@ -88,8 +88,15 @@ export default function Home() {
 
   const addKeyMapping = () =>
     setKeyMappings([...keyMappings, { id: Date.now(), endpoint: '', key: '' }])
-  const removeKeyMapping = (id: number) =>
-    setKeyMappings(keyMappings.filter((m) => m.id !== id))
+  const removeKeyMapping = (id: number) => {
+    setKeyMappings((prev) => {
+      const newKeyMappings = prev.filter((m) => m.id !== id)
+      if (newKeyMappings.length === 0) {
+        setShowKeyOverrides(false)
+      }
+      return newKeyMappings
+    })
+  }
   const updateKeyMapping = (
     id: number,
     field: 'endpoint' | 'key',
@@ -228,9 +235,6 @@ export default function Home() {
   // --- JSX (UI部分) ---
   return (
     <>
-      <Head>
-        <title>microCMS Exporter</title>
-      </Head>
       <Toaster position="top-right" />
 
       <Container size="md" my="xl">
@@ -348,8 +352,9 @@ export default function Home() {
                   {showKeyOverrides && (
                     <Stack>
                       {keyMappings.map((mapping) => (
-                        <Group key={mapping.id} grow>
+                        <Group key={mapping.id} wrap="nowrap" gap="md">
                           <TextInput
+                            style={{ flex: 1 }}
                             placeholder="エンドポイント名"
                             value={mapping.endpoint}
                             onChange={(e) =>
@@ -361,6 +366,7 @@ export default function Home() {
                             }
                           />
                           <PasswordInput
+                            style={{ flex: 1 }}
                             placeholder="対応するAPIキー"
                             value={mapping.key}
                             onChange={(e) =>
@@ -400,7 +406,12 @@ export default function Home() {
                   <Stack>
                     <TextInput
                       label="リスト形式APIのエンドポイント"
-                      description={<> <kbd>Enter</kbd>で追加</>}
+                      description={
+                        <>
+                          {' '}
+                          <Kbd>Enter</Kbd>で追加
+                        </>
+                      }
                       placeholder="news"
                       value={currentListEndpoint}
                       onChange={(e) => setCurrentListEndpoint(e.target.value)}
@@ -439,7 +450,12 @@ export default function Home() {
                   <Stack>
                     <TextInput
                       label="オブジェクト形式APIのエンドポイント"
-                      description={<> <kbd>Enter</kbd>で追加</>}
+                      description={
+                        <>
+                          {' '}
+                          <Kbd>Enter</Kbd>で追加
+                        </>
+                      }
                       placeholder="settings"
                       value={currentObjectEndpoint}
                       onChange={(e) => setCurrentObjectEndpoint(e.target.value)}
