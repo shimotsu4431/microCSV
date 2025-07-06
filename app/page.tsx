@@ -198,6 +198,11 @@ export default function Home() {
     }
   }
 
+  const isFormValid =
+    serviceId.trim() !== '' &&
+    defaultApiKey.trim() !== '' &&
+    (listEndpoints.length > 0 || objectEndpoints.length > 0)
+
   // --- JSX (UI部分) ---
   return (
     <>
@@ -425,7 +430,7 @@ export default function Home() {
 
         <button
           onClick={handleDownload}
-          disabled={isLoading}
+          disabled={isLoading || !isFormValid}
           className={styles.downloadButton}
         >
           {isLoading ? '処理中です...' : 'CSVファイルをダウンロード'}
