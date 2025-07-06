@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Head from 'next/head'
 import { Toaster, toast } from 'react-hot-toast'
 import styles from './Home.module.css'
-import { createClient, MicroCMSContentId, MicroCMSDate } from 'microcms-js-sdk'
+import { createClient } from 'microcms-js-sdk'
 import JSZip from 'jszip'
 import Papa from 'papaparse'
 
