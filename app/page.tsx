@@ -290,7 +290,9 @@ export default function Home() {
             <Stack gap="lg">
               <Paper withBorder p="xl" radius="md">
                 <Stack>
-                  <Title order={2}>共通設定</Title>
+                  <Title order={2} size={24}>
+                    共通設定
+                  </Title>
                   <TextInput
                     label="サービスID"
                     description="https://xxxx.microcms.io の xxxxの部分"
@@ -404,7 +406,9 @@ export default function Home() {
             <Stack gap="lg">
               <Paper withBorder p="xl" radius="md">
                 <Stack>
-                  <Title order={2}>エクスポートするAPI</Title>
+                  <Title order={2} size={24}>
+                    エクスポートするAPI
+                  </Title>
                   <Stack>
                     <TextInput
                       label="リスト形式APIのエンドポイント"
