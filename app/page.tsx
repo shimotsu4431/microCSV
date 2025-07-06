@@ -247,14 +247,29 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.infoBox}>
-            <h4>【ご確認ください】 APIキーの権限について</h4>
+            <h3>💡APIキーの権限について</h3>
             <p>
-              ダウンロードされるコンテンツは、使用するAPIキーの権限設定に依存します。
-              <br />- <b>下書き</b>を含めたい場合:
-              APIキーの設定で「下書きコンテンツの全取得」にチェックを入れてください。
-              <br />- <b>公開終了</b>を含めたい場合:
-              APIキーの設定で「公開終了コンテンツの全取得」にチェックを入れてください。
+              APIキーの<strong>「GET」権限</strong>を付与してご利用ください。
+              <br />
+              また、ダウンロードされるコンテンツは、使用する
+              <a
+                href="https://document.microcms.io/content-api/x-microcms-api-key"
+                target="_blank"
+              >
+                APIキーの権限設定
+              </a>
+              に依存します。
             </p>
+            <ul>
+              <li>
+                <b>「下書き」のコンテンツ</b>を含めたい場合:
+                APIキーの設定で「下書きコンテンツの全取得」にチェックを入れてください。
+              </li>
+              <li>
+                <b>「公開終了」のコンテンツ</b>を含めたい場合:
+                APIキーの設定で「公開終了コンテンツの全取得」にチェックを入れてください。
+              </li>
+            </ul>
           </div>
           <div className={styles.formSection}>
             <label

@@ -112,7 +112,7 @@
   border-radius: 5px;
 }
 
-.infoBox h4 {
+.infoBox h3 {
   margin-top: 0;
   margin-bottom: 0.5em;
 }
@@ -121,6 +121,21 @@
   font-size: 0.9em;
   margin: 0;
   line-height: 1.6;
+  color: var(--info-text-color);
+}
+
+.infoBox p a {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+.infoBox ul {
+  padding-left: 20px;
+  margin: 20px 0 0 0;
+}
+
+.infoBox li {
+  margin-bottom: 10px;
   color: var(--info-text-color);
 }
 
