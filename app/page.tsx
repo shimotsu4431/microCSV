@@ -241,14 +241,16 @@ export default function Home() {
         <Stack gap="xl">
           <Stack gap="xs" align="center">
             <Title order={1}>microCMS Exporter</Title>
-            <Text c="dimmed" ta="center">
+            <Text ta="center">
               このツールでは、microCMSのコンテンツデータを一括で取得し、CSV形式のファイルとしてZIPでダウンロードします。
               <br />
               <Text span fw={700}>
                 APIキーなどの情報は外部に送信されず、すべての処理はあなたのブラウザ内で完結するため安全です。
               </Text>
             </Text>
-            <Text size="sm" c="dimmed">
+            <Text>
+              なお、本ツールはOSSとして公開しており、GitHubでソースコードを確認できます。
+              <br />
               リポジトリ:{' '}
               <Anchor
                 href="https://github.com/shimotsu4431/microcms-downloader-tool"
@@ -272,7 +274,7 @@ export default function Home() {
                 <li>
                   <Text size="sm">
                     <b>エクスポートするAPI</b>
-                    に、ダウンロードしたいAPIのエンドポイント名を入力します（Enterで追加）
+                    に、ダウンロードしたいAPIのエンドポイント名を入力します
                   </Text>
                 </li>
                 <li>
