@@ -3,20 +3,44 @@
 import { useState } from 'react'
 import Head from 'next/head'
 import { Toaster, toast } from 'react-hot-toast'
-import styles from './Home.module.css'
 import { createClient } from 'microcms-js-sdk'
 import JSZip from 'jszip'
 import Papa from 'papaparse'
+import {
+  Container,
+  Title,
+  Text,
+  TextInput,
+  Button,
+  Stack,
+  Group,
+  PasswordInput,
+  Checkbox,
+  ActionIcon,
+  Paper,
+  Alert,
+  Anchor,
+  Loader,
+  SimpleGrid,
+  Badge,
+} from '@mantine/core'
+import {
+  IconInfoCircle,
+  IconTrash,
+  IconPlus,
+  IconDownload,
+  IconX,
+} from '@tabler/icons-react'
 
 // --- 型定義 ---
 type KeyMapping = { id: number; endpoint: string; key: string }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Content = any
 
 export default function Home() {
   // --- State管理 ---
   const [serviceId, setServiceId] = useState('')
   const [defaultApiKey, setDefaultApiKey] = useState('')
-  const [showDefaultKey, setShowDefaultKey] = useState(false)
 
   // List-API states
   const [listEndpoints, setListEndpoints] = useState<string[]>([])
@@ -28,9 +52,6 @@ export default function Home() {
 
   const [showKeyOverrides, setShowKeyOverrides] = useState(false)
   const [keyMappings, setKeyMappings] = useState<KeyMapping[]>([])
-  const [showMappedKeys, setShowMappedKeys] = useState<Record<number, boolean>>(
-    {}
-  )
   const [isLoading, setIsLoading] = useState(false)
 
   // --- UI操作ハンドラ ---
@@ -188,6 +209,7 @@ export default function Home() {
           window.URL.revokeObjectURL(url)
         }, 100)
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error(error)
       toast.error(error.message || 'エラーが発生しました。', {
@@ -211,280 +233,275 @@ export default function Home() {
       </Head>
       <Toaster position="top-right" />
 
-      <main className={styles.main}>
-        <h1>microCMS Exporter</h1>
-        <div className={styles.overview}>
-          <p>
-            このツールでは、microCMSのコンテンツデータを一括で取得し、CSV形式のファイルとしてZIPでダウンロードします。
-            <br />
-            <strong>
-              APIキーなどの情報は外部に送信されず、すべての処理はあなたのブラウザ内で完結するため安全です。
-            </strong>
-          </p>
-          <p>
-            なお、本ツールはOSSとして公開されており、GitHubでソースコードを確認できます。
-            <br />
-            リポジトリ:{' '}
-            <a
-              href="https://github.com/shimotsu4431/microcms-downloader-tool"
-              target="_blank"
-            >
-              https://github.com/shimotsu4431/microcms-downloader-tool
-            </a>
-          </p>
-        </div>
-
-        <div className={styles.usageList}>
-          <h4>基本的な使い方</h4>
-          <ol>
-            <li>
-              <b>共通設定</b>
-              に、あなたのmicroCMSのサービスIDとAPIキーを入力します
-            </li>
-            <li>
-              <b>エクスポートするAPI</b>
-              に、ダウンロードしたいAPIのエンドポイント名を入力します（Enterで追加）
-            </li>
-            <li>
-              ［CSVファイルをダウンロード］をクリックすると、処理が開始されます
-            </li>
-          </ol>
-        </div>
-
-        <div className={styles.exportSection}>
-          <h2>共通設定</h2>
-          <div className={styles.formSection}>
-            <label htmlFor="serviceId">
-              サービスID（https://xxxx.microcms.io の xxxxの部分）
-            </label>
-            <input
-              id="serviceId"
-              type="text"
-              value={serviceId}
-              onChange={(e) => setServiceId(e.target.value)}
-              disabled={isLoading}
-              className={styles.input}
-              style={{ paddingRight: '10px' }}
-            />
-          </div>
-          <div className={styles.formSection}>
-            <label htmlFor="defaultApiKey">APIキー</label>
-            <div className={styles.inputWrapper}>
-              <input
-                id="defaultApiKey"
-                type={showDefaultKey ? 'text' : 'password'}
-                value={defaultApiKey}
-                onChange={(e) => setDefaultApiKey(e.target.value)}
-                disabled={isLoading}
-                className={styles.input}
-              />
-              <button
-                type="button"
-                onClick={() => setShowDefaultKey(!showDefaultKey)}
-                className={styles.keyToggleButton}
-                aria-label="APIキーの表示を切り替える"
-              >
-                <span className="material-icons" style={{ fontSize: '20px' }}>
-                  {showDefaultKey ? 'visibility' : 'visibility_off'}
-                </span>
-              </button>
-            </div>
-          </div>
-          <div className={styles.infoBox}>
-            <h3>💡APIキーの権限について</h3>
-            <p>
-              APIキーの<strong>「GET」権限</strong>を付与してご利用ください。
+      <Container size="md" my="xl">
+        <Stack gap="xl">
+          <Stack gap="xs" align="center">
+            <Title order={1}>microCMS Exporter</Title>
+            <Text c="dimmed" ta="center">
+              このツールでは、microCMSのコンテンツデータを一括で取得し、CSV形式のファイルとしてZIPでダウンロードします。
               <br />
-              また、ダウンロードされるコンテンツは、使用する
-              <a
-                href="https://document.microcms.io/content-api/x-microcms-api-key"
+              <Text span fw={700}>
+                APIキーなどの情報は外部に送信されず、すべての処理はあなたのブラウザ内で完結するため安全です。
+              </Text>
+            </Text>
+            <Text size="sm" c="dimmed">
+              リポジトリ:{' '}
+              <Anchor
+                href="https://github.com/shimotsu4431/microcms-downloader-tool"
                 target="_blank"
               >
-                APIキーの権限設定
-              </a>
-              に依存します。
-            </p>
-            <ul>
-              <li>
-                <b>「下書き」のコンテンツ</b>を含めたい場合:
-                <br />
-                APIキーの設定で「下書きコンテンツの全取得」にチェックを入れてください。
-              </li>
-              <li>
-                <b>「公開終了」のコンテンツ</b>を含めたい場合:
-                <br />
-                APIキーの設定で「公開終了コンテンツの全取得」にチェックを入れてください。
-              </li>
-            </ul>
-          </div>
-          <div className={styles.formSection}>
-            <label
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                cursor: 'pointer',
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={showKeyOverrides}
-                onChange={(e) => setShowKeyOverrides(e.target.checked)}
-              />
-              特定のエンドポイントに別のAPIキーを使う
-            </label>
-            {showKeyOverrides && (
-              <div className={styles.overridesContainer}>
-                {keyMappings.map((mapping) => (
-                  <div key={mapping.id} className={styles.mappingRow}>
-                    <input
-                      type="text"
-                      placeholder="エンドポイント名"
-                      value={mapping.endpoint}
-                      onChange={(e) =>
-                        updateKeyMapping(mapping.id, 'endpoint', e.target.value)
-                      }
-                      className={styles.input}
-                      style={{ paddingRight: '10px' }}
-                    />
-                    <div
-                      className={styles.inputWrapper}
-                      style={{ flexGrow: 1 }}
-                    >
-                      <input
-                        type={showMappedKeys[mapping.id] ? 'text' : 'password'}
-                        placeholder="対応するAPIキー"
-                        value={mapping.key}
-                        onChange={(e) =>
-                          updateKeyMapping(mapping.id, 'key', e.target.value)
-                        }
-                        className={styles.input}
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowMappedKeys((prev) => ({
-                            ...prev,
-                            [mapping.id]: !prev[mapping.id],
-                          }))
-                        }
-                        className={styles.keyToggleButton}
-                        aria-label="APIキーの表示を切り替える"
+                https://github.com/shimotsu4431/microcms-downloader-tool
+              </Anchor>
+            </Text>
+          </Stack>
+
+          <Paper withBorder p="md">
+            <Stack>
+              <Title order={4}>基本的な使い方</Title>
+              <ol style={{ margin: 0, paddingLeft: '20px' }}>
+                <li>
+                  <Text size="sm">
+                    <b>共通設定</b>
+                    に、あなたのmicroCMSのサービスIDとAPIキーを入力します
+                  </Text>
+                </li>
+                <li>
+                  <Text size="sm">
+                    <b>エクスポートするAPI</b>
+                    に、ダウンロードしたいAPIのエンドポイント名を入力します（Enterで追加）
+                  </Text>
+                </li>
+                <li>
+                  <Text size="sm">
+                    ［CSVファイルをダウンロード］をクリックすると、処理が開始されます
+                  </Text>
+                </li>
+              </ol>
+            </Stack>
+          </Paper>
+
+          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
+            <Stack gap="lg">
+              <Paper withBorder p="xl" radius="md">
+                <Stack>
+                  <Title order={2}>共通設定</Title>
+                  <TextInput
+                    label="サービスID"
+                    description="https://xxxx.microcms.io の xxxxの部分"
+                    placeholder="your-service-id"
+                    value={serviceId}
+                    onChange={(e) => setServiceId(e.target.value)}
+                    disabled={isLoading}
+                    required
+                  />
+                  <PasswordInput
+                    label="APIキー"
+                    placeholder="Your API Key"
+                    value={defaultApiKey}
+                    onChange={(e) => setDefaultApiKey(e.target.value)}
+                    disabled={isLoading}
+                    required
+                  />
+                  <Alert
+                    variant="light"
+                    color="blue"
+                    title="APIキーの権限について"
+                    icon={<IconInfoCircle />}
+                  >
+                    <Text size="sm">
+                      APIキーの<b>「GET」権限</b>を付与してご利用ください。
+                      <br />
+                      また、ダウンロードされるコンテンツは、使用する{' '}
+                      <Anchor
+                        href="https://document.microcms.io/content-api/x-microcms-api-key"
+                        target="_blank"
                       >
-                        <span
-                          className="material-icons"
-                          style={{ fontSize: '20px' }}
-                        >
-                          {showMappedKeys[mapping.id]
-                            ? 'visibility'
-                            : 'visibility_off'}
-                        </span>
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => removeKeyMapping(mapping.id)}
-                      className={styles.removeRowButton}
-                      aria-label="このAPIキーを削除"
-                    >
-                      <span className="material-icons">delete</span>
-                    </button>
-                  </div>
-                ))}
-                <button onClick={addKeyMapping} className={styles.addRowButton}>
-                  + APIキーを追加
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+                        APIキーの権限設定
+                      </Anchor>
+                      に依存します。
+                    </Text>
+                    <ul style={{ paddingLeft: '20px', marginTop: '8px' }}>
+                      <li>
+                        <Text size="xs">
+                          <b>「下書き」のコンテンツ</b>を含めたい場合:
+                          <br />
+                          APIキーの設定で「下書きコンテンツの全取得」にチェックを入れてください。
+                        </Text>
+                      </li>
+                      <li>
+                        <Text size="xs">
+                          <b>「公開終了」のコンテンツ</b>を含めたい場合:
+                          <br />
+                          APIキーの設定で「公開終了コンテンツの全取得」にチェックを入れてください。
+                        </Text>
+                      </li>
+                    </ul>
+                  </Alert>
+                  <Checkbox
+                    label="特定のエンドポイントに別のAPIキーを使う"
+                    checked={showKeyOverrides}
+                    onChange={(e) =>
+                      setShowKeyOverrides(e.currentTarget.checked)
+                    }
+                    disabled={isLoading}
+                  />
+                  {showKeyOverrides && (
+                    <Stack>
+                      {keyMappings.map((mapping) => (
+                        <Group key={mapping.id} grow>
+                          <TextInput
+                            placeholder="エンドポイント名"
+                            value={mapping.endpoint}
+                            onChange={(e) =>
+                              updateKeyMapping(
+                                mapping.id,
+                                'endpoint',
+                                e.target.value
+                              )
+                            }
+                          />
+                          <PasswordInput
+                            placeholder="対応するAPIキー"
+                            value={mapping.key}
+                            onChange={(e) =>
+                              updateKeyMapping(
+                                mapping.id,
+                                'key',
+                                e.target.value
+                              )
+                            }
+                          />
+                          <ActionIcon
+                            color="red"
+                            onClick={() => removeKeyMapping(mapping.id)}
+                            aria-label="このAPIキーを削除"
+                          >
+                            <IconTrash size={16} />
+                          </ActionIcon>
+                        </Group>
+                      ))}
+                      <Button
+                        onClick={addKeyMapping}
+                        leftSection={<IconPlus size={14} />}
+                        variant="outline"
+                      >
+                        APIキーを追加
+                      </Button>
+                    </Stack>
+                  )}
+                </Stack>
+              </Paper>
+            </Stack>
 
-        <div className={styles.exportSection}>
-          <h2>エクスポートするAPI</h2>
-          <div className={styles.formSection}>
-            <label htmlFor="list-endpoints">
-              リスト形式APIのエンドポイント (Enterで追加)
-            </label>
-            {listEndpoints.length > 0 && (
-              <div className={styles.tagContainer}>
-                {listEndpoints.map((ep) => (
-                  <div key={ep} className={styles.tag}>
-                    {ep}
-                    <button
-                      onClick={() => handleRemoveEndpoint('list', ep)}
-                      className={styles.tagRemoveButton}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-            <input
-              id="list-endpoints"
-              type="text"
-              value={currentListEndpoint}
-              onChange={(e) => setCurrentListEndpoint(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === 'Enter' &&
-                (e.preventDefault(), handleAddEndpoint('list'))
-              }
-              disabled={isLoading}
-              className={styles.input}
-              style={{ paddingRight: '10px' }}
-            />
-          </div>
+            <Stack gap="lg">
+              <Paper withBorder p="xl" radius="md">
+                <Stack>
+                  <Title order={2}>エクスポートするAPI</Title>
+                  <Stack>
+                    <TextInput
+                      label="リスト形式APIのエンドポイント"
+                      description={<> <kbd>Enter</kbd>で追加</>}
+                      placeholder="news"
+                      value={currentListEndpoint}
+                      onChange={(e) => setCurrentListEndpoint(e.target.value)}
+                      onKeyDown={(e) =>
+                        e.key === 'Enter' &&
+                        (e.preventDefault(), handleAddEndpoint('list'))
+                      }
+                      disabled={isLoading}
+                    />
+                    {listEndpoints.length > 0 && (
+                      <Group gap="xs">
+                        {listEndpoints.map((ep) => (
+                          <Badge
+                            key={ep}
+                            variant="outline"
+                            style={{ textTransform: 'none' }}
+                            size="lg"
+                            rightSection={
+                              <ActionIcon
+                                size="xs"
+                                color="blue"
+                                radius="xl"
+                                variant="transparent"
+                                onClick={() => handleRemoveEndpoint('list', ep)}
+                              >
+                                <IconX size={12} />
+                              </ActionIcon>
+                            }
+                          >
+                            {ep}
+                          </Badge>
+                        ))}
+                      </Group>
+                    )}
+                  </Stack>
+                  <Stack>
+                    <TextInput
+                      label="オブジェクト形式APIのエンドポイント"
+                      description={<> <kbd>Enter</kbd>で追加</>}
+                      placeholder="settings"
+                      value={currentObjectEndpoint}
+                      onChange={(e) => setCurrentObjectEndpoint(e.target.value)}
+                      onKeyDown={(e) =>
+                        e.key === 'Enter' &&
+                        (e.preventDefault(), handleAddEndpoint('object'))
+                      }
+                      disabled={isLoading}
+                    />
+                    {objectEndpoints.length > 0 && (
+                      <Group gap="xs">
+                        {objectEndpoints.map((ep) => (
+                          <Badge
+                            key={ep}
+                            variant="outline"
+                            style={{ textTransform: 'none' }}
+                            size="lg"
+                            rightSection={
+                              <ActionIcon
+                                size="xs"
+                                color="blue"
+                                radius="xl"
+                                variant="transparent"
+                                onClick={() =>
+                                  handleRemoveEndpoint('object', ep)
+                                }
+                              >
+                                <IconX size={12} />
+                              </ActionIcon>
+                            }
+                          >
+                            {ep}
+                          </Badge>
+                        ))}
+                      </Group>
+                    )}
+                  </Stack>
+                </Stack>
+              </Paper>
+              <Button
+                onClick={handleDownload}
+                disabled={isLoading || !isFormValid}
+                size="lg"
+                leftSection={
+                  isLoading ? <Loader size="sm" /> : <IconDownload size={20} />
+                }
+              >
+                {isLoading ? '処理中です...' : 'CSVファイルをダウンロード'}
+              </Button>
+            </Stack>
+          </SimpleGrid>
 
-          <div className={styles.formSection}>
-            <label htmlFor="object-endpoints">
-              オブジェクト形式APIのエンドポイント (Enterで追加)
-            </label>
-            {objectEndpoints.length > 0 && (
-              <div className={styles.tagContainer}>
-                {objectEndpoints.map((ep) => (
-                  <div key={ep} className={styles.tag}>
-                    {ep}
-                    <button
-                      onClick={() => handleRemoveEndpoint('object', ep)}
-                      className={styles.tagRemoveButton}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-            <input
-              id="object-endpoints"
-              type="text"
-              value={currentObjectEndpoint}
-              onChange={(e) => setCurrentObjectEndpoint(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === 'Enter' &&
-                (e.preventDefault(), handleAddEndpoint('object'))
-              }
-              disabled={isLoading}
-              className={styles.input}
-              style={{ paddingRight: '10px' }}
-            />
-          </div>
-        </div>
-
-        <button
-          onClick={handleDownload}
-          disabled={isLoading || !isFormValid}
-          className={styles.downloadButton}
-        >
-          {isLoading ? '処理中です...' : 'CSVファイルをダウンロード'}
-        </button>
-        <div className={styles.makerInfo}>
-          <p>
-            作者:{' '}
-            <a href="https://x.com/shimotsu_" target="blank_">
-              @shimotsu_
-            </a>
-          </p>
-        </div>
-      </main>
+          <Group justify="center">
+            <Text size="sm" c="dimmed">
+              作者:{' '}
+              <Anchor href="https://x.com/shimotsu_" target="_blank">
+                @shimotsu_
+              </Anchor>
+            </Text>
+          </Group>
+        </Stack>
+      </Container>
     </>
   )
 }
