@@ -84,7 +84,17 @@ export default function Home() {
             </Stack>
           </SimpleGrid>
 
-          <Group justify="center">
+          <Group justify="center" mt="xl">
+            <Text size="sm" c="dimmed">
+              <Anchor
+                href="https://forms.gle/iSpp2zmcm4SiyXb39"
+                target="_blank"
+              >
+                お問い合わせ
+              </Anchor>
+            </Text>
+          </Group>
+          <Group justify="center" mb="xl">
             <Text size="sm" c="dimmed">
               作者:{' '}
               <Anchor href="https://x.com/shimotsu_" target="_blank">
