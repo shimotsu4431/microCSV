@@ -15,6 +15,7 @@ import { IconDownload } from '@tabler/icons-react'
 import { useMicroCMSDownloader } from './hooks/useMicroCMSDownloader'
 import { Header } from './components/Header'
 import { Instruction } from './components/Instruction'
+import { Precautions } from './components/Precautions'
 import { Settings } from './components/Settings'
 import { EndpointInput } from './components/EndpointInput'
 
@@ -47,6 +48,7 @@ export default function Home() {
         <Stack gap="xl">
           <Header />
           <Instruction />
+          <Precautions />
 
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
             <Stack gap="lg">
