@@ -4,7 +4,9 @@ import { Title, Text, Anchor, Stack } from '@mantine/core'
 
 export const Header = () => (
   <Stack gap="xs" align="center">
-    <Title order={1}>microCMS Exporter</Title>
+    <Title order={1} mt={30} mb={30} size={36}>
+      microCSV
+    </Title>
     <Text ta="center">
       このツールでは、microCMSのコンテンツデータを一括で取得し、CSV形式のファイルとしてZIPでダウンロードします。
       <br />
