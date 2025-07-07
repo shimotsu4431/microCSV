@@ -10,7 +10,6 @@ import {
   Title,
   Paper,
 } from '@mantine/core'
-import { IconInfoCircle } from '@tabler/icons-react'
 import { KeyOverride } from './KeyOverride'
 
 type KeyMapping = { id: number; endpoint: string; key: string }
@@ -56,12 +55,7 @@ export const Settings = ({
         disabled={isLoading}
         required
       />
-      <Alert
-        variant="light"
-        color="blue"
-        title="APIキーの権限について"
-        icon={<IconInfoCircle />}
-      >
+      <Alert variant="light" color="blue" title="APIキーの権限について">
         <Text size="sm">
           APIキーの<b>「GET」権限</b>を付与してご利用ください。
           <br />
