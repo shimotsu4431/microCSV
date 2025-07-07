@@ -127,9 +127,19 @@ export const useMicroCMSDownloader = () => {
         }, 100)
       }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error(error)
-      toast.error(error.message || 'エラーが発生しました。', {
+    } catch (error) {
+      let errorMessage = 'エラーが発生しました。'
+      if (error instanceof Error) {
+        errorMessage = error.message
+        // microCMS APIからのエラーでない場合のみコンソールに出力
+        if (!errorMessage.includes('fetch API response status:')) {
+          console.error(error)
+        }
+      } else {
+        // 不明なエラーはコンソールに出力
+        console.error(error)
+      }
+      toast.error(errorMessage, {
         id: loadingToastId,
       })
     } finally {
