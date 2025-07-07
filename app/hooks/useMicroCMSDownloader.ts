@@ -33,73 +33,76 @@ export const useMicroCMSDownloader = () => {
     setIsLoading(true)
     const loadingToastId = toast.loading('コンテンツを取得・圧縮中です...')
 
-    const timerPromise = new Promise((resolve) => setTimeout(resolve, 5000))
+    const successfulEndpoints: string[] = []
+    const emptyEndpoints: string[] = []
+
+    const timerPromise = new Promise((resolve) => setTimeout(resolve, 3000))
 
     const downloadLogicPromise = (async () => {
       const zip = new JSZip()
+      const allEndpoints = [
+        ...listEndpoints.map((ep) => ({ name: ep, type: 'list' as const })),
+        ...objectEndpoints.map((ep) => ({ name: ep, type: 'object' as const })),
+      ]
 
-      const processEndpoint = async (
-        endpoint: string,
-        type: 'list' | 'object'
-      ) => {
-        const apiKey =
-          keyMappings.find((m) => m.endpoint === endpoint)?.key || defaultApiKey
-        if (!apiKey) throw new Error(`${endpoint}用のAPIキーがありません。`)
+      for (const { name: endpoint, type } of allEndpoints) {
+        try {
+          const apiKey =
+            keyMappings.find((m) => m.endpoint === endpoint)?.key ||
+            defaultApiKey
+          if (!apiKey) throw new Error(`用のAPIキーがありません。`)
 
-        const client = createClient({
-          serviceDomain: serviceId,
-          apiKey: apiKey,
-        })
-        let contents: Content[] = []
-
-        if (type === 'list') {
-          contents = await client.getAllContents<Content>({
-            endpoint,
+          const client = createClient({
+            serviceDomain: serviceId,
+            apiKey: apiKey,
           })
-        } else {
-          const objectContent = await client.getObject<Content>({ endpoint })
-          contents = [objectContent]
-        }
+          let contents: Content[] = []
 
-        if (contents.length === 0) return
-
-        const contentsForCsv = contents.map((content) => {
-          const newContent = { ...content }
-          for (const key in newContent) {
-            if (
-              typeof newContent[key] === 'object' &&
-              newContent[key] !== null
-            ) {
-              newContent[key] = JSON.stringify(newContent[key])
-            }
+          if (type === 'list') {
+            contents = await client.getAllContents<Content>({ endpoint })
+          } else {
+            const objectContent = await client.getObject<Content>({ endpoint })
+            contents = [objectContent]
           }
-          return newContent
-        })
 
-        const allKeys = new Set<string>()
-        contentsForCsv.forEach((item) =>
-          Object.keys(item).forEach((key) => allKeys.add(key))
-        )
-        const header = Array.from(allKeys)
-        const csv = Papa.unparse(contentsForCsv, { columns: header })
-        zip.file(`${endpoint}.csv`, csv)
+          if (contents.length === 0) {
+            emptyEndpoints.push(endpoint)
+            continue
+          }
+
+          const contentsForCsv = contents.map((content) => {
+            const newContent = { ...content }
+            for (const key in newContent) {
+              if (
+                typeof newContent[key] === 'object' &&
+                newContent[key] !== null
+              ) {
+                newContent[key] = JSON.stringify(newContent[key])
+              }
+            }
+            return newContent
+          })
+
+          const allKeys = new Set<string>()
+          contentsForCsv.forEach((item) =>
+            Object.keys(item).forEach((key) => allKeys.add(key))
+          )
+          const header = Array.from(allKeys)
+          const csv = Papa.unparse(contentsForCsv, { columns: header })
+          zip.file(`${endpoint}.csv`, csv)
+          successfulEndpoints.push(endpoint)
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : '不明なエラーです。'
+          throw new Error(`[${endpoint}] ${message}`)
+        }
       }
 
-      try {
-        for (const endpoint of listEndpoints) {
-          await processEndpoint(endpoint, 'list')
-        }
-        for (const endpoint of objectEndpoints) {
-          await processEndpoint(endpoint, 'object')
-        }
-      } catch (error) {
-        throw error
+      if (successfulEndpoints.length === 0) {
+        return null
       }
 
       const zipContent = await zip.generateAsync({ type: 'blob' })
-      if (zipContent.size === 0) {
-        throw new Error('ダウンロード対象のコンテンツがありませんでした。')
-      }
 
       return {
         blob: zipContent,
@@ -114,7 +117,16 @@ export const useMicroCMSDownloader = () => {
       const downloadResult = result[0]
 
       if (downloadResult) {
-        toast.success('ダウンロードが完了しました！', { id: loadingToastId })
+        let successMessage = `ダウンロードが完了しました (${successfulEndpoints.join(
+          ', '
+        )})。`
+        if (emptyEndpoints.length > 0) {
+          successMessage += `\n${emptyEndpoints.join(
+            ', '
+          )} は0件のためスキップしました。`
+        }
+        toast.success(successMessage, { id: loadingToastId, duration: 6000 })
+
         setTimeout(() => {
           const url = window.URL.createObjectURL(downloadResult.blob)
           const a = document.createElement('a')
@@ -125,22 +137,27 @@ export const useMicroCMSDownloader = () => {
           a.remove()
           window.URL.revokeObjectURL(url)
         }, 100)
+      } else {
+        if (emptyEndpoints.length > 0) {
+          toast.error('指定されたAPIのコンテンツは全て0件でした。', {
+            id: loadingToastId,
+          })
+        }
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       let errorMessage = 'エラーが発生しました。'
       if (error instanceof Error) {
         errorMessage = error.message
-        // microCMS APIからのエラーでない場合のみコンソールに出力
-        if (!errorMessage.includes('fetch API response status:')) {
+        if (!errorMessage.includes('404')) {
           console.error(error)
         }
       } else {
-        // 不明なエラーはコンソールに出力
         console.error(error)
       }
       toast.error(errorMessage, {
         id: loadingToastId,
+        duration: 6000,
       })
     } finally {
       setIsLoading(false)
