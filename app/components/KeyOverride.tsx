@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Checkbox,
   Stack,
@@ -20,20 +20,24 @@ interface KeyOverrideProps {
   isLoading: boolean
 }
 
-export const KeyOverride = ({ keyMappings, setKeyMappings, isLoading }: KeyOverrideProps) => {
+export const KeyOverride = ({
+  keyMappings,
+  setKeyMappings,
+  isLoading,
+}: KeyOverrideProps) => {
   const [showKeyOverrides, setShowKeyOverrides] = useState(false)
+
+  useEffect(() => {
+    if (keyMappings.length === 0) {
+      setShowKeyOverrides(false)
+    }
+  }, [keyMappings])
 
   const addKeyMapping = () =>
     setKeyMappings([...keyMappings, { id: Date.now(), endpoint: '', key: '' }])
 
   const removeKeyMapping = (id: number) => {
-    setKeyMappings((prev) => {
-      const newKeyMappings = prev.filter((m) => m.id !== id)
-      if (newKeyMappings.length === 0) {
-        setShowKeyOverrides(false)
-      }
-      return newKeyMappings
-    })
+    setKeyMappings((prev) => prev.filter((m) => m.id !== id))
   }
 
   const updateKeyMapping = (
