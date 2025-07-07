@@ -1,6 +1,15 @@
 'use client'
 
-import { TextInput, PasswordInput, Alert, Text, Anchor, Stack, Title, Paper } from '@mantine/core'
+import {
+  TextInput,
+  PasswordInput,
+  Alert,
+  Text,
+  Anchor,
+  Stack,
+  Title,
+  Paper,
+} from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
 import { KeyOverride } from './KeyOverride'
 
@@ -27,7 +36,7 @@ export const Settings = ({
 }: SettingsProps) => (
   <Paper withBorder p="xl" radius="md">
     <Stack>
-      <Title order={2} size={24}>
+      <Title order={2} size={22}>
         共通設定
       </Title>
       <TextInput

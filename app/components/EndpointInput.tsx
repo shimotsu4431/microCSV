@@ -65,7 +65,7 @@ export const EndpointInput = ({
   return (
     <Paper withBorder p="xl" radius="md">
       <Stack>
-        <Title order={2} size={24}>
+        <Title order={2} size={22}>
           エクスポートするAPI
         </Title>
         <Stack>
@@ -81,7 +81,8 @@ export const EndpointInput = ({
             value={currentListEndpoint}
             onChange={(e) => setCurrentListEndpoint(e.target.value)}
             onKeyDown={(e) =>
-              e.key === 'Enter' && (e.preventDefault(), handleAddEndpoint('list'))
+              e.key === 'Enter' &&
+              (e.preventDefault(), handleAddEndpoint('list'))
             }
             disabled={isLoading}
           />

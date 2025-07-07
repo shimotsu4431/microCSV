@@ -3,26 +3,24 @@
 import { Title, Text, Anchor, Stack } from '@mantine/core'
 
 export const Header = () => (
-  <Stack gap="xs" align="center">
-    <Title order={1} mt={30} mb={30} size={32}>
+  <Stack gap="xs">
+    <Title order={1} mt={16} mb={16} size={24}>
       microCSV
     </Title>
-    <Text ta="center">
-      microCSVは、microCMSのコンテンツデータを一括で取得し、CSV形式のファイルとしてZIPでダウンロードするツールです。
-    </Text>
-    <Text ta="center">
+    <Text>
+      microCMSのコンテンツを一括で取得し、CSV形式でダウンロードするツールです。
+      <br />
       APIキーなどの情報は、microCMS以外の外部のサーバに送信されず、すべての処理はブラウザ内で完結するため安全です。
     </Text>
-    <Text>
-      なお、本ツールはOSSとして公開しており、GitHubでソースコードを確認できます。
-      <br />
-      リポジトリ:{' '}
+    <Text size="sm">
+      本ツールはOSSとして公開しており、GitHubで
       <Anchor
         href="https://github.com/shimotsu4431/microcms-downloader-tool"
         target="_blank"
       >
-        https://github.com/shimotsu4431/microcms-downloader-tool
+        ソースコード
       </Anchor>
+      を確認できます。
     </Text>
   </Stack>
 )
