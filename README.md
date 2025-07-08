@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# microCSV
 
-## Getting Started
+microCSV は、ヘッドレス CMS である microCMS に保存されたコンテンツを、手軽に CSV ファイルとしてエクスポートできる Web ツールです。複数の API から同時にデータを取得し、zip 形式でまとめてダウンロードできるツールです。
 
-First, run the development server:
+API キーなどの入力された情報は、microCMS の API サーバーへの通信にのみ利用されます。外部のサーバーに情報が送信されることはなく、すべての処理はブラウザ内で完結するため、安全にご利用いただけます。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 使い方
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. https://microcms.vercel.app にアクセスします
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. 共通設定として、対象となるサービス ID と API キーをそれぞれ入力します
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. （任意）エンドポイントごとに API キーを使い分ける場合は、「特定のエンドポイントに別の API キーを使う」にチェックを入れ、個別に入力します
 
-## Learn More
+4. ［CSV ファイルをダウンロード］ボタンを押して、ダウンロードを実行します
 
-To learn more about Next.js, take a look at the following resources:
+5. 処理が完了すると、`microcms-export_{日付}.zip` という名前の zip ファイルがダウンロードされます。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 注意事項／免責
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- 本ツールは非公式のツールです。ツールの利用によって生じたいかなる損害についても、開発者は一切の責任を負いません。自己責任でご利用ください。
 
-## Deploy on Vercel
+- microCMS の API には各種利用制限があります。大量のコンテンツを取得する際にはご注意ください。詳細は[公式ドキュメントの制限事項](https://document.microcms.io/manual/limitations)をご確認ください。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- API キーの権限不足やエンドポイントの指定間違いによりエラーが発生することがあります。エラー内容の詳細は[公式ドキュメントのエラーレスポンスまとめ](https://document.microcms.io/content-api/api-error-response)をご確認ください。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## お問い合わせ
+
+[こちらのフォーム](https://docs.google.com/forms/d/e/1FAIpQLSdihgA7okkIaqCD6jnwSUV-DUBALMEqewaU-zvnJ01AiIcqhQ/viewform)からご連絡ください。

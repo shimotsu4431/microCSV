@@ -5,7 +5,7 @@ import { Paper, Stack, Title, Anchor, Text } from '@mantine/core'
 export const Precautions = () => (
   <Paper p="md" style={{ backgroundColor: '#faf6da' }}>
     <Stack>
-      <Title order={4}>注意事項</Title>
+      <Title order={4}>注意事項／免責</Title>
       <ul style={{ margin: 0, paddingLeft: '20px' }}>
         <li>
           <Text size="sm">
