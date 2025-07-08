@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { toast } from 'react-hot-toast'
 import { createClient } from 'microcms-js-sdk'
 import JSZip from 'jszip'
@@ -8,7 +8,19 @@ import Papa from 'papaparse'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Content = any
-type KeyMapping = { id: number; endpoint: string; key: string }
+export type KeyMapping = { id: number; endpoint: string; key: string }
+export type DownloadHistoryEntry = {
+  id: number
+  serviceId: string
+  defaultApiKey: string
+  listEndpoints: string[]
+  objectEndpoints: string[]
+  keyMappings: KeyMapping[]
+  createdAt: string
+}
+
+const HISTORY_STORAGE_KEY = 'microcms-downloader-history'
+const MAX_HISTORY_COUNT = 5
 
 export const useMicroCMSDownloader = () => {
   const [serviceId, setServiceId] = useState('')
@@ -17,6 +29,84 @@ export const useMicroCMSDownloader = () => {
   const [objectEndpoints, setObjectEndpoints] = useState<string[]>([])
   const [keyMappings, setKeyMappings] = useState<KeyMapping[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [history, setHistory] = useState<DownloadHistoryEntry[]>([])
+
+  useEffect(() => {
+    try {
+      const storedHistory = localStorage.getItem(HISTORY_STORAGE_KEY)
+      if (storedHistory) {
+        setHistory(JSON.parse(storedHistory))
+      }
+    } catch (error) {
+      console.error('Failed to load history from localStorage', error)
+      toast.error('履歴の読み込みに失敗しました。')
+    }
+  }, [])
+
+  const saveHistory = useCallback(() => {
+    const newEntry: DownloadHistoryEntry = {
+      id: Date.now(),
+      serviceId,
+      defaultApiKey,
+      listEndpoints,
+      objectEndpoints,
+      keyMappings,
+      createdAt: new Date().toISOString(),
+    }
+
+    try {
+      const updatedHistory = [newEntry, ...history]
+        .filter(
+          (entry, index, self) =>
+            index ===
+            self.findIndex(
+              (e) =>
+                e.serviceId === entry.serviceId &&
+                e.defaultApiKey === entry.defaultApiKey &&
+                JSON.stringify(e.listEndpoints.sort()) ===
+                  JSON.stringify(entry.listEndpoints.sort()) &&
+                JSON.stringify(e.objectEndpoints.sort()) ===
+                  JSON.stringify(entry.objectEndpoints.sort()) &&
+                JSON.stringify(e.keyMappings.sort((a, b) => a.id - b.id)) ===
+                  JSON.stringify(entry.keyMappings.sort((a, b) => a.id - b.id))
+            )
+        )
+        .slice(0, MAX_HISTORY_COUNT)
+
+      setHistory(updatedHistory)
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updatedHistory))
+    } catch (error) {
+      console.error('Failed to save history to localStorage', error)
+      toast.error('履歴の保存に失敗しました。')
+    }
+  }, [
+    serviceId,
+    defaultApiKey,
+    listEndpoints,
+    objectEndpoints,
+    keyMappings,
+    history,
+  ])
+
+  const restoreFromHistory = useCallback((entry: DownloadHistoryEntry) => {
+    setServiceId(entry.serviceId)
+    setDefaultApiKey(entry.defaultApiKey)
+    setListEndpoints(entry.listEndpoints)
+    setObjectEndpoints(entry.objectEndpoints)
+    setKeyMappings(entry.keyMappings)
+    toast.success('履歴から設定を復元しました。')
+  }, [])
+
+  const clearHistory = useCallback(() => {
+    try {
+      setHistory([])
+      localStorage.removeItem(HISTORY_STORAGE_KEY)
+      toast.success('ダウンロード履歴を削除しました。')
+    } catch (error) {
+      console.error('Failed to clear history from localStorage', error)
+      toast.error('履歴の削除に失敗しました。')
+    }
+  }, [])
 
   const handleDownload = async () => {
     if (
@@ -61,7 +151,10 @@ export const useMicroCMSDownloader = () => {
           if (type === 'list') {
             contents = await client.getAllContents<Content>({ endpoint })
           } else {
-            const objectContent = await client.getObject<Content>({ endpoint })
+            const objectContent = await client.getObject<Content>({
+              endpoint,
+              queries: { fields: [] },
+            })
             contents = [objectContent]
           }
 
@@ -92,8 +185,12 @@ export const useMicroCMSDownloader = () => {
           zip.file(`${endpoint}.csv`, csv)
           successfulEndpoints.push(endpoint)
         } catch (error) {
-          const message =
+          let message =
             error instanceof Error ? error.message : '不明なエラーです。'
+          if (message.includes('GET is forbidden')) {
+            message =
+              '指定されたAPIキーでGETリクエストが許可されていません。キーの権限を確認してください。'
+          }
           throw new Error(`[${endpoint}] ${message}`)
         }
       }
@@ -117,13 +214,13 @@ export const useMicroCMSDownloader = () => {
       const downloadResult = result[0]
 
       if (downloadResult) {
+        saveHistory()
         let successMessage = `ダウンロードが完了しました (${successfulEndpoints.join(
           ', '
         )})。`
         if (emptyEndpoints.length > 0) {
-          successMessage += `\n${emptyEndpoints.join(
-            ', '
-          )} は0件のためスキップしました。`
+          successMessage += `
+${emptyEndpoints.join(', ')} は0件のためスキップしました。`
         }
         toast.success(successMessage, { id: loadingToastId, duration: 6000 })
 
@@ -177,5 +274,8 @@ export const useMicroCMSDownloader = () => {
     setKeyMappings,
     isLoading,
     handleDownload,
+    history,
+    restoreFromHistory,
+    clearHistory,
   }
 }

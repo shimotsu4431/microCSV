@@ -18,6 +18,7 @@ import { Instruction } from './components/Instruction'
 import { Precautions } from './components/Precautions'
 import { Settings } from './components/Settings'
 import { EndpointInput } from './components/EndpointInput'
+import { DownloadHistory } from './components/DownloadHistory'
 
 export default function Home() {
   const {
@@ -33,6 +34,9 @@ export default function Home() {
     setKeyMappings,
     isLoading,
     handleDownload,
+    history,
+    restoreFromHistory,
+    clearHistory,
   } = useMicroCMSDownloader()
 
   const isFormValid =
@@ -83,6 +87,13 @@ export default function Home() {
               </Button>
             </Stack>
           </SimpleGrid>
+
+          <DownloadHistory
+            history={history}
+            onRestore={restoreFromHistory}
+            onClear={clearHistory}
+            isLoading={isLoading}
+          />
 
           <Group justify="center" mt="xl">
             <Text size="sm" c="dimmed">
