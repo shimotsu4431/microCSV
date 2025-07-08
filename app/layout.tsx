@@ -2,6 +2,11 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import '@mantine/core/styles.css'
 import { ColorSchemeScript } from '@mantine/core'
 import { Providers } from './providers'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'microCSV',
+}
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
