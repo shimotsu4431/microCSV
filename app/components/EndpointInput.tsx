@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'react-hot-toast'
 import {
   TextInput,
   Group,
@@ -32,19 +33,22 @@ export const EndpointInput = ({
   const [currentObjectEndpoint, setCurrentObjectEndpoint] = useState('')
 
   const handleAddEndpoint = (type: 'list' | 'object') => {
-    if (
-      type === 'list' &&
-      currentListEndpoint &&
-      !listEndpoints.includes(currentListEndpoint)
-    ) {
-      setListEndpoints([...listEndpoints, currentListEndpoint])
+    const endpoint =
+      type === 'list' ? currentListEndpoint : currentObjectEndpoint
+    const existingEndpoints = type === 'list' ? listEndpoints : objectEndpoints
+
+    if (!endpoint) return
+
+    if (existingEndpoints.includes(endpoint)) {
+      toast.error(`エンドポイント「${endpoint}」は既に追加されています。`)
+      return
+    }
+
+    if (type === 'list') {
+      setListEndpoints([...listEndpoints, endpoint])
       setCurrentListEndpoint('')
-    } else if (
-      type === 'object' &&
-      currentObjectEndpoint &&
-      !objectEndpoints.includes(currentObjectEndpoint)
-    ) {
-      setObjectEndpoints([...objectEndpoints, currentObjectEndpoint])
+    } else {
+      setObjectEndpoints([...objectEndpoints, endpoint])
       setCurrentObjectEndpoint('')
     }
   }
