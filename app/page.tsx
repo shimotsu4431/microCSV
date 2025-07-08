@@ -45,7 +45,7 @@ export default function Home() {
       <Toaster position="top-right" />
 
       <Container size="md" my="xl">
-        <Stack gap="xl">
+        <Stack gap="md">
           <Header />
           <Instruction />
           <Precautions />
