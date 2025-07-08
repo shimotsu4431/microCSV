@@ -92,7 +92,19 @@ export const EndpointInput = ({
                 <Badge
                   key={ep}
                   variant="outline"
-                  style={{ textTransform: 'none' }}
+                  style={{
+                    textTransform: 'none',
+                    transition: 'all .2s ease',
+                    cursor: 'pointer',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        backgroundColor: '#e7f5ff',
+                        color: '#1971c2',
+                      },
+                    },
+                  }}
                   size="lg"
                   rightSection={
                     <ActionIcon
@@ -136,7 +148,19 @@ export const EndpointInput = ({
                 <Badge
                   key={ep}
                   variant="outline"
-                  style={{ textTransform: 'none' }}
+                  style={{
+                    textTransform: 'none',
+                    transition: 'all .2s ease',
+                    cursor: 'pointer',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        backgroundColor: '#e7f5ff',
+                        color: '#1971c2',
+                      },
+                    },
+                  }}
                   size="lg"
                   rightSection={
                     <ActionIcon

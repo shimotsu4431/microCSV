@@ -57,6 +57,14 @@ export const KeyOverride = ({
         checked={showKeyOverrides}
         onChange={(e) => setShowKeyOverrides(e.currentTarget.checked)}
         disabled={isLoading}
+        styles={{
+          label: {
+            cursor: 'pointer',
+            '&:hover': {
+              textDecoration: 'underline',
+            },
+          },
+        }}
       />
       {showKeyOverrides && (
         <Stack>
