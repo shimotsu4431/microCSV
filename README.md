@@ -6,7 +6,7 @@ API キーなどの入力された情報は、microCMS の API サーバーへ�
 
 ## 使い方
 
-1. https://microcms.vercel.app にアクセスします
+1. https://micro-csv.vercel.app にアクセスします
 
 2. 共通設定として、対象となるサービス ID と API キーをそれぞれ入力します
 
