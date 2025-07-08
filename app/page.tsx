@@ -52,7 +52,6 @@ export default function Home() {
         <Stack gap="md">
           <Header />
           <Instruction />
-          <Precautions />
 
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
             <Stack gap="lg">
@@ -95,6 +94,7 @@ export default function Home() {
             isLoading={isLoading}
           />
 
+          <Precautions />
           <Group justify="center" mt="xl">
             <Text size="sm" c="dimmed">
               <Anchor
