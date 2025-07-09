@@ -39,6 +39,14 @@ export const EndpointInput = ({
 
     if (!endpoint) return
 
+    const endpointRegex = /^[a-z0-9_-]{3,32}$/
+    if (!endpointRegex.test(endpoint)) {
+      toast.error(
+        'エンドポイント名は3文字以上32文字以下の半角小文字英数字、ハイフン(-)、アンダースコア(_)のみ使用できます。'
+      )
+      return
+    }
+
     if (existingEndpoints.includes(endpoint)) {
       toast.error(`エンドポイント「${endpoint}」は既に追加されています。`)
       return
