@@ -91,7 +91,7 @@ export const DownloadHistory = ({
                     {entry.listEndpoints.length > 0 && (
                       <Group gap="xs" pl="lg" pt="xs">
                         {entry.listEndpoints.map((ep) => (
-                          <Badge key={ep} variant="light">
+                          <Badge key={ep} variant="light" style={{ textTransform: 'none' }}>
                             {ep}
                           </Badge>
                         ))}
@@ -108,7 +108,7 @@ export const DownloadHistory = ({
                     {entry.objectEndpoints.length > 0 && (
                       <Group gap="xs" pl="lg" pt="xs">
                         {entry.objectEndpoints.map((ep) => (
-                          <Badge key={ep} variant="light">
+                          <Badge key={ep} variant="light" style={{ textTransform: 'none' }}>
                             {ep}
                           </Badge>
                         ))}
