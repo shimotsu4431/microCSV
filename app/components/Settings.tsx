@@ -10,7 +10,6 @@ import {
   Title,
   Paper,
 } from '@mantine/core'
-import { KeyOverride } from './KeyOverride'
 
 type KeyMapping = { id: number; endpoint: string; key: string }
 
@@ -85,11 +84,6 @@ export const Settings = ({
           </li>
         </ul>
       </Alert>
-      <KeyOverride
-        keyMappings={keyMappings}
-        setKeyMappings={setKeyMappings}
-        isLoading={isLoading}
-      />
     </Stack>
   </Paper>
 )
