@@ -93,6 +93,14 @@ export const useMicroCMSDownloader = () => {
   }, [])
 
   const handleDownload = async () => {
+    const serviceIdRegex = /^[a-zA-Z0-9-]{3,32}$/
+    if (!serviceIdRegex.test(serviceId)) {
+      toast.error(
+        'サービスIDは3文字以上32文字以下の半角英数字とハイフンのみ使用できます。'
+      )
+      return
+    }
+
     if (
       !serviceId ||
       (listEndpoints.length === 0 && objectEndpoints.length === 0) ||
