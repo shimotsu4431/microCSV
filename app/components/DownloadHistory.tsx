@@ -11,12 +11,7 @@ import {
   Box,
   ScrollArea,
 } from '@mantine/core'
-import {
-  IconTrash,
-  IconList,
-  IconBlockquote,
-  IconKey,
-} from '@tabler/icons-react'
+import { IconTrash, IconList, IconCodeDots, IconKey } from '@tabler/icons-react'
 import { DownloadHistoryEntry } from '../hooks/useMicroCMSDownloader'
 
 interface DownloadHistoryProps {
@@ -102,7 +97,7 @@ export const DownloadHistory = ({
                   </Box>
                   <Box>
                     <Group gap="xs">
-                      <IconBlockquote size={16} />
+                      <IconCodeDots size={16} />
                       <Text size="sm" fw={500}>
                         オブジェクト形式API ({entry.objectEndpoints.length})
                       </Text>
