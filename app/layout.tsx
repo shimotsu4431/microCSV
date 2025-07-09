@@ -4,8 +4,28 @@ import { ColorSchemeScript } from '@mantine/core'
 import { Providers } from './providers'
 import type { Metadata } from 'next'
 
+const siteName = 'microCSV'
+const description =
+  'microCMSのコンテンツを一括で取得し、CSV形式でダウンロードするツールです。'
+const url = 'https://micro-csv.vercel.app'
+
 export const metadata: Metadata = {
-  title: 'microCSV',
+  title: siteName,
+  description,
+  metadataBase: new URL(url),
+  openGraph: {
+    title: siteName,
+    description,
+    url,
+    siteName,
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: siteName,
+    description,
+  },
 }
 
 const geistSans = Geist({
