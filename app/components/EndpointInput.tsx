@@ -117,6 +117,7 @@ export const EndpointInput = ({
                       radius="xl"
                       variant="transparent"
                       onClick={() => handleRemoveEndpoint('list', ep)}
+                      disabled={isLoading}
                     >
                       <IconX size={12} />
                     </ActionIcon>
@@ -173,6 +174,7 @@ export const EndpointInput = ({
                       radius="xl"
                       variant="transparent"
                       onClick={() => handleRemoveEndpoint('object', ep)}
+                      disabled={isLoading}
                     >
                       <IconX size={12} />
                     </ActionIcon>
