@@ -20,7 +20,7 @@ export type DownloadHistoryEntry = {
 }
 
 const HISTORY_STORAGE_KEY = 'microcms-downloader-history'
-const MAX_HISTORY_COUNT = 5
+const MAX_HISTORY_COUNT = 10
 
 export const useMicroCMSDownloader = () => {
   const [serviceId, setServiceId] = useState('')

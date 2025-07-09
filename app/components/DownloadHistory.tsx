@@ -12,7 +12,6 @@ import {
   ScrollArea,
 } from '@mantine/core'
 import {
-  IconHistory,
   IconTrash,
   IconList,
   IconBlockquote,
@@ -42,7 +41,6 @@ export const DownloadHistory = ({
       <Stack>
         <Group justify="space-between">
           <Group>
-            <IconHistory size={24} />
             <Title order={2} size={22}>
               ダウンロード履歴
             </Title>
@@ -91,7 +89,11 @@ export const DownloadHistory = ({
                     {entry.listEndpoints.length > 0 && (
                       <Group gap="xs" pl="lg" pt="xs">
                         {entry.listEndpoints.map((ep) => (
-                          <Badge key={ep} variant="light" style={{ textTransform: 'none' }}>
+                          <Badge
+                            key={ep}
+                            variant="light"
+                            style={{ textTransform: 'none' }}
+                          >
                             {ep}
                           </Badge>
                         ))}
@@ -108,7 +110,11 @@ export const DownloadHistory = ({
                     {entry.objectEndpoints.length > 0 && (
                       <Group gap="xs" pl="lg" pt="xs">
                         {entry.objectEndpoints.map((ep) => (
-                          <Badge key={ep} variant="light" style={{ textTransform: 'none' }}>
+                          <Badge
+                            key={ep}
+                            variant="light"
+                            style={{ textTransform: 'none' }}
+                          >
                             {ep}
                           </Badge>
                         ))}
