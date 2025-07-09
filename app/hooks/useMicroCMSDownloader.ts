@@ -203,9 +203,11 @@ export const useMicroCMSDownloader = () => {
 
       return {
         blob: zipContent,
-        fileName: `microcms-export_${
-          new Date().toISOString().split('T')[0]
-        }.zip`,
+        fileName: `microcms-export_${new Date()
+          .toISOString()
+          .slice(0, 19)
+          .replace('T', '_')
+          .replace(/:/g, '-')}.zip`,
       }
     })()
 
