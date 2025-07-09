@@ -28,8 +28,6 @@ export const Settings = ({
   setServiceId,
   defaultApiKey,
   setDefaultApiKey,
-  keyMappings,
-  setKeyMappings,
   isLoading,
 }: SettingsProps) => (
   <Paper withBorder p="xl" radius="md">
