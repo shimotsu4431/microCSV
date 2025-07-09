@@ -101,6 +101,12 @@ export const useMicroCMSDownloader = () => {
       return
     }
 
+    const apiKeyRegex = /^[a-zA-Z0-9]{36}$/
+    if (!apiKeyRegex.test(defaultApiKey)) {
+      toast.error('APIキーの形式が正しくありません。')
+      return
+    }
+
     if (
       !serviceId ||
       (listEndpoints.length === 0 && objectEndpoints.length === 0) ||
