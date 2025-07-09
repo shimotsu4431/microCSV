@@ -55,23 +55,7 @@ export const useMicroCMSDownloader = () => {
     }
 
     try {
-      const updatedHistory = [newEntry, ...history]
-        .filter(
-          (entry, index, self) =>
-            index ===
-            self.findIndex(
-              (e) =>
-                e.serviceId === entry.serviceId &&
-                e.defaultApiKey === entry.defaultApiKey &&
-                JSON.stringify(e.listEndpoints.sort()) ===
-                  JSON.stringify(entry.listEndpoints.sort()) &&
-                JSON.stringify(e.objectEndpoints.sort()) ===
-                  JSON.stringify(entry.objectEndpoints.sort()) &&
-                JSON.stringify(e.keyMappings.sort((a, b) => a.id - b.id)) ===
-                  JSON.stringify(entry.keyMappings.sort((a, b) => a.id - b.id))
-            )
-        )
-        .slice(0, MAX_HISTORY_COUNT)
+      const updatedHistory = [newEntry, ...history].slice(0, MAX_HISTORY_COUNT)
 
       setHistory(updatedHistory)
       localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updatedHistory))
