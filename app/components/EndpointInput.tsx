@@ -39,6 +39,16 @@ export const EndpointInput = ({
 
     if (!endpoint) return
 
+    if (type === 'list' && listEndpoints.length >= 10) {
+      toast.error('リスト形式APIは10個までしか追加できません。')
+      return
+    }
+
+    if (type === 'object' && objectEndpoints.length >= 10) {
+      toast.error('オブジェクト形式APIは10個までしか追加できません。')
+      return
+    }
+
     const endpointRegex = /^[a-z0-9_-]{3,32}$/
     if (!endpointRegex.test(endpoint)) {
       toast.error(
@@ -82,7 +92,7 @@ export const EndpointInput = ({
         </Title>
         <Stack>
           <TextInput
-            label="リスト形式APIのエンドポイント"
+            label="リスト形式APIのエンドポイント（最大10個）"
             description={
               <>
                 {' '}
@@ -139,7 +149,7 @@ export const EndpointInput = ({
         </Stack>
         <Stack>
           <TextInput
-            label="オブジェクト形式APIのエンドポイント"
+            label="オブジェクト形式APIのエンドポイント（最大10個）"
             description={
               <>
                 {' '}
