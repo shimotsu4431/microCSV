@@ -45,7 +45,7 @@ export const Settings = ({
         required
       />
       <PasswordInput
-        label="デフォルトAPIキー"
+        label="APIキー"
         placeholder="Your API Key"
         value={defaultApiKey}
         onChange={(e) => setDefaultApiKey(e.target.value)}
