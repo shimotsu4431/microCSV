@@ -209,6 +209,11 @@ export const useMicroCMSDownloader = () => {
             '指定されたAPIキーでGETリクエストが許可されていません。キーの権限を確認してください。'
         } else if (message.includes('404')) {
           message = 'エンドポイントが見つかりません。'
+        } else if (
+          message.includes('401') &&
+          message.includes('X-MICROCMS-API-KEY header is invalid')
+        ) {
+          message = 'APIキーが正しくありません。'
         }
         return { status: 'rejected', endpoint, reason: message }
       }
