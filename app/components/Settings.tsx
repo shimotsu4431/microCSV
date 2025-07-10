@@ -9,17 +9,14 @@ import {
   Stack,
   Title,
   Paper,
+  List,
 } from '@mantine/core'
-
-type KeyMapping = { id: number; endpoint: string; key: string }
 
 interface SettingsProps {
   serviceId: string
   setServiceId: (id: string) => void
   defaultApiKey: string
   setDefaultApiKey: (key: string) => void
-  keyMappings: KeyMapping[]
-  setKeyMappings: React.Dispatch<React.SetStateAction<KeyMapping[]>>
   isLoading: boolean
 }
 
@@ -31,56 +28,67 @@ export const Settings = ({
   isLoading,
 }: SettingsProps) => (
   <Paper withBorder p="xl" radius="md">
-    <Stack>
-      <Title order={2} size={22}>
-        共通設定
-      </Title>
+    <Stack gap="xl">
+      <Stack gap="xs">
+        <Title order={2} size={22}>
+          共通設定
+        </Title>
+        <Text size="sm" c="dimmed">
+          すべてのAPIで共通して使用する情報を設定します。
+        </Text>
+      </Stack>
+
       <TextInput
         label="サービスID"
-        description="https://xxxx.microcms.io の xxxxの部分"
+        description="https://xxxx.microcms.io の xxxx の部分です。"
         placeholder="your-service-id"
         value={serviceId}
-        onChange={(e) => setServiceId(e.target.value)}
+        onChange={(e) => setServiceId(e.currentTarget.value)}
         disabled={isLoading}
         required
       />
       <PasswordInput
-        label="APIキー"
+        label="APIキー（デフォルト）"
+        description="コンテンツを取得するためのAPIキーです。個別設定がない場合はこのキーが使われます。"
         placeholder="Your API Key"
         value={defaultApiKey}
-        onChange={(e) => setDefaultApiKey(e.target.value)}
+        onChange={(e) => setDefaultApiKey(e.currentTarget.value)}
         disabled={isLoading}
         required
       />
       <Alert variant="light" color="blue" title="APIキーの権限について">
-        <Text size="sm">
-          APIキーの<b>「GET」権限</b>を付与してご利用ください。
-          <br />
-          また、ダウンロードされるコンテンツは、使用する{' '}
-          <Anchor
-            href="https://document.microcms.io/content-api/x-microcms-api-key"
-            target="_blank"
-          >
-            APIキーの権限設定
-          </Anchor>
-          に依存します。
-        </Text>
-        <ul style={{ paddingLeft: '20px', marginTop: '8px' }}>
-          <li>
-            <Text size="xs">
-              <b>「下書き」のコンテンツ</b>を含めたい場合:
-              <br />
-              APIキーの設定で「下書きコンテンツの全取得」にチェックを入れてください。
+        <Stack gap="sm">
+          <Text size="sm">
+            APIキーに
+            <Text span fw={700} mx={4}>
+              「GET権限」
             </Text>
-          </li>
-          <li>
-            <Text size="xs">
-              <b>「公開終了」のコンテンツ</b>を含めたい場合:
-              <br />
-              APIキーの設定で「公開終了コンテンツの全取得」にチェックを入れてください。
-            </Text>
-          </li>
-        </ul>
+            を付与してご利用ください。ダウンロードされるコンテンツは、使用する
+            <Anchor
+              href="https://document.microcms.io/content-api/x-microcms-api-key"
+              target="_blank"
+              rel="noopener noreferrer"
+              mx={4}
+            >
+              APIキーの権限設定
+            </Anchor>
+            に依存します。
+          </Text>
+          <List spacing="xs" size="sm" center>
+            <List.Item style={{ lineHeight: 1.4 }}>
+              <Text span fw={700} size="sm">
+                「下書き中」
+              </Text>
+              のコンテンツを含めるには、APIキー設定で「下書き状態のコンテンツも取得する」にチェックを入れてください。
+            </List.Item>
+            <List.Item style={{ lineHeight: 1.4 }}>
+              <Text span fw={700} size="sm">
+                「公開終了」
+              </Text>
+              のコンテンツを含めるには、APIキー設定で「公開終了状態のコンテンツも取得する」にチェックを入れてください。
+            </List.Item>
+          </List>
+        </Stack>
       </Alert>
     </Stack>
   </Paper>

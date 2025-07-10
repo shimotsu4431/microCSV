@@ -39,7 +39,7 @@ export const DownloadHistory = ({
         <Group justify="space-between">
           <Group>
             <Title order={2} size={22}>
-              ダウンロード履歴
+              ダウンロード履歴（直近の10件）
             </Title>
           </Group>
           <Button
