@@ -28,7 +28,7 @@ export const Settings = ({
   isLoading,
 }: SettingsProps) => (
   <Paper withBorder p="xl" radius="md">
-    <Stack gap="xl">
+    <Stack gap="md">
       <Stack gap="xs">
         <Title order={2} size={22}>
           共通設定

@@ -129,13 +129,16 @@ export const EndpointInput = ({
   const handleAddEndpoint = useCallback(
     (type: EndpointType, endpoint: string) => {
       const setter = type === 'list' ? setListEndpoints : setObjectEndpoints
-      const existingEndpoints = type === 'list' ? listEndpoints : objectEndpoints
+      const existingEndpoints =
+        type === 'list' ? listEndpoints : objectEndpoints
 
       if (!endpoint) return
 
       if (existingEndpoints.length >= MAX_ENDPOINTS) {
         toast.error(
-          `${type === 'list' ? 'リスト' : 'オブジェクト'}形式APIは${MAX_ENDPOINTS}個までしか追加できません。`
+          `${
+            type === 'list' ? 'リスト' : 'オブジェクト'
+          }形式APIは${MAX_ENDPOINTS}個までしか追加できません。`
         )
         return
       }
@@ -172,7 +175,7 @@ export const EndpointInput = ({
 
   return (
     <Paper withBorder p="xl" radius="md">
-      <Stack gap="xl">
+      <Stack gap="md">
         <Stack gap="xs">
           <Title order={2} size={22}>
             エクスポートするAPI
