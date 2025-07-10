@@ -166,7 +166,7 @@ export const useMicroCMSDownloader = () => {
       return false
     }
 
-    const apiKeyRegex = /^[a-zA-Z0-9]{36}$/
+    const apiKeyRegex = /^(?:[a-zA-Z0-9]{36}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$/
     if (!apiKeyRegex.test(defaultApiKey)) {
       toast.error('APIキーの形式が正しくありません。')
       return false
