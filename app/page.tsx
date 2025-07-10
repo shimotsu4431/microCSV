@@ -30,8 +30,6 @@ export default function Home() {
     setListEndpoints,
     objectEndpoints,
     setObjectEndpoints,
-    keyMappings,
-    setKeyMappings,
     isLoading,
     handleDownload,
     history,
@@ -60,8 +58,6 @@ export default function Home() {
                 setServiceId={setServiceId}
                 defaultApiKey={defaultApiKey}
                 setDefaultApiKey={setDefaultApiKey}
-                keyMappings={keyMappings}
-                setKeyMappings={setKeyMappings}
                 isLoading={isLoading}
               />
             </Stack>
