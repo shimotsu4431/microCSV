@@ -42,19 +42,21 @@ export const DownloadHistory = ({
               ダウンロード履歴（直近の10件）
             </Title>
           </Group>
-          <Button
-            variant="outline"
-            color="red"
-            onClick={onClear}
-            disabled={isLoading || history.length === 0}
-            leftSection={<IconTrash size={14} />}
-          >
-            履歴を削除
-          </Button>
+          {history.length >= 1 && (
+            <Button
+              variant="outline"
+              color="red"
+              onClick={onClear}
+              disabled={isLoading || history.length === 0}
+              leftSection={<IconTrash size={14} />}
+            >
+              履歴を削除
+            </Button>
+          )}
         </Group>
 
         {history.length === 0 ? (
-          <Stack align="center" gap="xs" py="lg">
+          <Stack align="center" gap="xs" py="xl">
             <IconHistory size={42} stroke={1.5} color="gray" />
             <Text c="dimmed">履歴はまだありません。</Text>
           </Stack>
