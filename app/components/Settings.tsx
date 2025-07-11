@@ -49,7 +49,7 @@ export const Settings = ({
       />
       <PasswordInput
         label="APIキー（デフォルト）"
-        description="コンテンツを取得するためのAPIキーです。個別設定がない場合はこのキーが使われます。"
+        description="コンテンツを取得するためのAPIキーです。"
         placeholder="Your API Key"
         value={defaultApiKey}
         onChange={(e) => setDefaultApiKey(e.currentTarget.value)}
