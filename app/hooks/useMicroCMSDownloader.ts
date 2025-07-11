@@ -115,12 +115,7 @@ export const useMicroCMSDownloader = () => {
     }
 
     try {
-      const updatedHistory = [newEntry, ...history]
-        .filter(
-          (entry, index, self) =>
-            index === self.findIndex((e) => e.serviceId === entry.serviceId)
-        )
-        .slice(0, MAX_HISTORY_COUNT)
+      const updatedHistory = [newEntry, ...history].slice(0, MAX_HISTORY_COUNT)
 
       setHistory(updatedHistory)
       localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updatedHistory))
